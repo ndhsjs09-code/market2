@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MW Market</title>
+    <title>SMA MARKET</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --gold: #d4af37; --bg: #050505; --card: #0f0f0f; }
-        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
+        :root { --main: #ffb6c1; --bg: #0a0a0a; --card: #141414; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
         .tab { display: none; } .active { display: block; }
-        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; text-transform: uppercase; }
-        .cat-card { background: var(--card); padding: 18px; margin-bottom: 8px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; color: var(--gold); }
-        .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; text-transform: uppercase; }
-        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; border-radius: 2px; }
-        .btn-small:disabled { border-color: #333; color: #444; cursor: not-allowed; }
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
-        .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 4px; box-sizing: border-box; text-align: center; }
-        .admin-sec { background: #0a0a0a; padding: 12px; border-radius: 4px; margin-top: 15px; border: 1px solid #1a1a1a; }
-        .copy-box { background: #000; padding: 12px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; font-family: monospace; }
+        .header { text-align: center; color: var(--main); font-weight: 900; margin-bottom: 20px; font-size: 22px; text-transform: uppercase; }
+        .cat-card { background: var(--card); padding: 18px; border-radius: 8px; margin-bottom: 8px; text-align: center; border: 1px solid #222; color: var(--main); font-weight: bold; cursor: pointer; }
+        .card { background: var(--card); border: 1px solid #1f1f1f; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; }
+        .btn { background: var(--main); color: #000; border: none; padding: 14px; border-radius: 6px; width: 100%; font-weight: 800; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .btn-small { background: var(--main); color: #000; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; border: none; }
+        .btn-small:disabled { background: #333; color: #666; }
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f0f; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { color: #555; cursor: pointer; font-weight: 900; } .active-nav { color: var(--main); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #111; color: #fff; border: 1px solid #222; border-radius: 6px; box-sizing: border-box; text-align: center; }
+        .copy-box { background: #000; padding: 15px; border: 1px dashed var(--main); margin: 10px 0; color: var(--main); font-weight: bold; cursor: pointer; text-align: center; font-family: monospace; font-size: 18px; }
     </style>
 </head>
 <body>
 
 <div id="store-tab" class="tab active">
-    <div class="header-title">MW STORE</div>
+    <div class="header">SMA MARKET</div>
     <div id="cat-menu">
         <div class="cat-card" onclick="showCat('3c/L')">3c / L</div>
         <div class="cat-card" onclick="showCat('4LL/CC')">4LL / CC</div>
@@ -40,166 +39,116 @@
 </div>
 
 <div id="cart-tab" class="tab">
-    <div class="header-title">MW CART</div>
+    <div class="header">SMA CART</div>
     <div id="cart-list"></div>
     <div id="checkout-sec" style="display:none">
-        <div class="admin-sec">
-            <select id="pay-sel" onchange="showPay(this.value)"><option value="">SELECT PAYMENT METHOD</option></select>
-            <div id="pay-details" style="display:none;">
-                <div class="copy-box" onclick="copyNum(this.innerText)" id="pay-num"></div>
-                <p style="text-align:center; font-size:10px; color:var(--gold)">TAP TO COPY</p>
-            </div>
-            <button class="btn" onclick="confirmOrder()">CONFIRM & CHECKOUT</button>
+        <select id="pay-sel" onchange="showPay(this.value)"><option value="">SELECT PAYMENT</option></select>
+        <div id="pay-details" style="display:none;">
+            <div class="copy-box" onclick="copyNum(this.innerText)" id="pay-num"></div>
+            <p style="text-align:center; font-size:10px; color:var(--main)">CLICK TO COPY</p>
         </div>
+        <button class="btn" onclick="confirmOrder()">CONFIRM ORDER</button>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
-    <div class="header-title">SYSTEM CONTROL</div>
-    <div class="admin-sec">
-        <select id="adm-cat">
-            <option value="3c/L">3c/L</option><option value="4LL/CC">4LL/CC</option>
-            <option value="4C/L Same">4C/L Same</option><option value="4C/L">4C/L</option>
-            <option value="Double/Triple">Double/Triple</option>
-        </select>
-        <textarea id="adm-in" rows="3" placeholder="user:pass:price"></textarea>
-        <button class="btn" onclick="doAdm('add_users')">ADD USERS</button>
-    </div>
-    <div class="admin-sec">
-        <input id="pay-in" placeholder="Method | Details">
-        <button class="btn" onclick="doAdm('add_pay')">ADD PAYMENT</button>
-        <div id="adm-pay-list" style="margin-top:10px"></div>
-    </div>
-    <div class="admin-sec">
-        <h4 style="color:var(--gold); margin:0 0 10px 0;">INVENTORY</h4>
-        <div id="adm-items-list"></div>
-    </div>
+    <div class="header">ADMIN PANEL</div>
+    <select id="adm-cat"><option value="3c/L">3c/L</option><option value="4LL/CC">4LL/CC</option><option value="4C/L Same">4C/L Same</option><option value="4C/L">4C/L</option><option value="Double/Triple">Double/Triple</option></select>
+    <textarea id="adm-in" rows="3" placeholder="user:pass:price (accepts : | / ;)"></textarea>
+    <button class="btn" onclick="doAdm('add_users')">SAVE USERS</button>
+    <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
+    <input id="pay-in" placeholder="Method | Details">
+    <button class="btn" onclick="doAdm('add_pay')">ADD PAYMENT</button>
+    <div id="adm-pay-list" style="margin-top:15px"></div>
+    <div id="adm-items-list" style="margin-top:15px"></div>
 </div>
 
 <nav class="nav">
     <div class="nav-item active-nav" onclick="tab('store-tab', this)">STORE</div>
     <div class="nav-item" onclick="tab('cart-tab', this)">CART (<span id="c-count">0</span>)</div>
-    <div id="adm-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">SYSTEM</div>
+    <div id="adm-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">ADMIN</div>
 </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw";
-    const clickSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/sma";
+    const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
     let allI = [], allP = [], cart = [];
 
-    // Admin Auth
-    if([5859388511, 6920293690].includes(tg.initDataUnsafe.user?.id)) {
-        document.getElementById('adm-btn').style.display='block';
-    }
+    if([5939498558].includes(tg.initDataUnsafe.user?.id)) document.getElementById("adm-btn").style.display="block";
 
     async function load() {
-        const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
-        const d = await r.json(); 
-        allI = d.items||[]; 
-        allP = d.payments||[];
-        renderAdmin(); 
-        renderCheckout();
+        const r = await fetch(API + "/get_all", { headers: {"ngrok-skip-browser-warning":"1"} });
+        const d = await r.json(); allI = d.items||[]; allP = d.payments||[];
+        renderAdmin(); renderCheckout();
     }
 
     function tab(id, el) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-        el.classList.add('active-nav');
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active-nav"));
+        el.classList.add("active-nav");
         load();
     }
 
-    async function doAdm(action) {
-        let content = (action==='add_users')?document.getElementById('adm-in').value:document.getElementById('pay-in').value;
-        await fetch(`${API}/admin/manage`, {
-            method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
-            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content, cat:document.getElementById('adm-cat').value})
+    function copyNum(t) {
+        const el = document.createElement("textarea");
+        el.value = t; document.body.appendChild(el);
+        el.select(); document.execCommand("copy");
+        document.body.removeChild(el);
+        tg.showAlert("COPIED TO CLIPBOARD");
+    }
+
+    async function confirmOrder() {
+        const sel = document.getElementById("pay-sel").value;
+        if(!sel) { tg.showAlert("SELECT PAYMENT METHOD"); return; }
+        const total = cart.reduce((s, i) => s + parseFloat(i.p), 0);
+        await fetch(API + "/send_order", {
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, user_name:tg.initDataUnsafe.user.username, items:cart, total:total, method:allP[sel].split("|")[0]})
         });
-        document.getElementById('adm-in').value = "";
-        document.getElementById('pay-in').value = "";
-        load();
-    }
-
-    async function del(action, val) {
-        await fetch(`${API}/admin/manage`, {
-            method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
-            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content:val})
-        });
-        load();
-    }
-
-    function renderAdmin() {
-        document.getElementById('adm-pay-list').innerHTML = allP.map(p => `<div class="card"><span>${p}</span><button class="btn-small" style="color:red; border-color:red" onclick="del('del_pay','${p}')">DEL</button></div>`).join('');
-        document.getElementById('adm-items-list').innerHTML = allI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="del('del_user','${i.u}')">DEL</button></div>`).join('');
+        tg.showAlert("ORDER SENT. SEND SCREENSHOT TO BOT.");
+        cart = []; document.getElementById("c-count").innerText = "0"; renderCart();
     }
 
     function addToCart(u, p) {
         if(cart.find(x => x.u === u)) return;
-        clickSound.play();
-        cart.push({u, p});
-        document.getElementById('c-count').innerText = cart.length;
+        audio.play(); cart.push({u, p});
+        document.getElementById("c-count").innerText = cart.length;
         renderCart();
-        tg.HapticFeedback.impactOccurred('light');
     }
 
     function renderCart() {
-        const list = document.getElementById('cart-list');
-        if(cart.length === 0) { 
-            list.innerHTML = "<p style='text-align:center; color:#555;'>CART IS EMPTY</p>"; 
-            document.getElementById('checkout-sec').style.display='none'; 
-            return; 
-        }
-        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" style="color:red; border-color:red" onclick="cart.splice(${idx},1);renderCart();">X</button></div>`).join('');
-        document.getElementById('checkout-sec').style.display = 'block';
+        const list = document.getElementById("cart-list");
+        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>EMPTY</p>"; document.getElementById("checkout-sec").style.display="none"; return; }
+        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" onclick="cart.splice(${idx},1);renderCart();">REMOVE</button></div>`).join("");
+        document.getElementById("checkout-sec").style.display = "block";
     }
 
-    async function confirmOrder() {
-        for(let item of cart) {
-            await del('del_user', item.u); 
-        }
-        tg.showAlert("PURCHASE CONFIRMED! SEND RECEIPT TO BOT.");
-        cart = []; 
-        document.getElementById('c-count').innerText = "0"; 
-        renderCart();
-        load();
-    }
-
-    function renderCheckout() {
-        const sel = document.getElementById('pay-sel');
-        sel.innerHTML = '<option value="">SELECT PAYMENT METHOD</option>' + allP.map((p, i) => `<option value="${i}">${p.split('|')[0]}</option>`).join('');
-    }
-
-    function showPay(i) {
-        if(i==="") { document.getElementById('pay-details').style.display='none'; return; }
-        document.getElementById('pay-details').style.display='block';
-        document.getElementById('pay-num').innerText = allP[i].split('|')[1]?.trim() || "NO DATA";
-    }
-
-    function copyNum(t) {
-        navigator.clipboard.writeText(t);
-        tg.showScanQrPopup({ text: "NUMBER COPIED!" });
-        setTimeout(() => tg.closeScanQrPopup(), 800);
+    function renderAdmin() {
+        document.getElementById("adm-pay-list").innerHTML = allP.map(p => {
+            let name = p.split('|')[0].trim();
+            return `<div class="card"><span>${name}</span><button class="btn-small" style="background:red;color:white" onclick="del('del_pay','${name}')">DEL</button></div>`;
+        }).join("");
+        document.getElementById("adm-items-list").innerHTML = allI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="background:red;color:white" onclick="del('del_user','${i.u}')">DEL</button></div>`).join("");
     }
 
     function showCat(c) {
-        document.getElementById('cat-menu').style.display='none'; 
-        document.getElementById('items-view').style.display='block';
+        document.getElementById("cat-menu").style.display="none"; document.getElementById("items-view").style.display="block";
         const fil = allI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = fil.length === 0 ? "<p style='text-align:center; color:#555;'>NO ITEMS AVAILABLE</p>" : fil.map(i => {
+        document.getElementById("items-list").innerHTML = fil.map(i => {
             const inCart = cart.find(x => x.u === i.u);
-            return `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div>
-            <button class="btn-small" ${inCart?'disabled':''} onclick="addToCart('${i.u}','${i.p}')">${inCart?'ADDED':'ADD'}</button></div>`;
-        }).join('');
+            return `<div class="card"><div><b>@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" ${inCart?"disabled":""} onclick="addToCart('${i.u}','${i.p}')">${inCart?"ADDED":"ADD"}</button></div>`;
+        }).join("");
     }
 
-    function backToCats() { 
-        document.getElementById('cat-menu').style.display='block'; 
-        document.getElementById('items-view').style.display='none'; 
-    }
+    function backToCats() { document.getElementById("cat-menu").style.display="block"; document.getElementById("items-view").style.display="none"; }
+    function renderCheckout() { const sel = document.getElementById("pay-sel"); sel.innerHTML = '<option value="">SELECT PAYMENT</option>' + allP.map((p, i) => `<option value="${i}">${p.split("|")[0]}</option>`).join(""); }
+    function showPay(i) { if(i==="") { document.getElementById("pay-details").style.display="none"; return; } document.getElementById("pay-details").style.display="block"; document.getElementById("pay-num").innerText = allP[i].split("|")[1]?.trim(); }
+    async function doAdm(action) { let content = (action==="add_users")?document.getElementById("adm-in").value:document.getElementById("pay-in").value; await fetch(API + "/admin/manage", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content, cat:document.getElementById("adm-cat").value})}); document.getElementById("adm-in").value=""; load(); }
+    async function del(action, val) { await fetch(API + "/admin/manage", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content:val})}); load(); }
 
-    tg.expand(); 
-    load();
+    tg.expand(); load();
 </script>
 </body>
 </html>
