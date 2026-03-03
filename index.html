@@ -14,12 +14,11 @@
         .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
         .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; text-transform: uppercase; }
         .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; }
-        .btn-small:disabled { border-color: #333; color: #444; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 4px; box-sizing: border-box; text-align: center; }
         .copy-box { background: #000; padding: 15px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; font-size: 18px; }
-        #img-preview { width: 100%; max-height: 150px; object-fit: contain; margin-top: 10px; display: none; border-radius: 4px; }
+        #img-preview { width: 100%; max-height: 150px; object-fit: contain; margin-top: 10px; display: none; border: 1px solid var(--gold); }
     </style>
 </head>
 <body>
@@ -46,13 +45,11 @@
         <select id="pay-sel" onchange="showPay(this.value)"><option value="">SELECT PAYMENT</option></select>
         <div id="pay-details" style="display:none;">
             <div class="copy-box" onclick="copyNum(this.innerText)" id="pay-num"></div>
-            <p style="text-align:center; font-size:10px; color:var(--gold)">TAP NUMBER TO COPY</p>
-            <hr style="border:0; border-top:1px solid #222; margin:15px 0;">
-            <p style="text-align:center; font-size:12px;">UPLOAD PAYMENT RECEIPT</p>
+            <p style="text-align:center; font-size:11px; color:var(--gold)">CLICK TO COPY NUMBER</p>
             <input type="file" id="receipt-file" accept="image/*" onchange="previewImg(this)">
             <img id="img-preview">
         </div>
-        <button class="btn" id="send-btn" onclick="confirmOrder()">SEND ORDER WITH RECEIPT</button>
+        <button class="btn" id="send-btn" onclick="confirmOrder()">SEND ORDER</button>
     </div>
 </div>
 
@@ -63,8 +60,8 @@
     <button class="btn" onclick="doAdm('add_users')">SAVE ITEMS</button>
     <input id="pay-in" placeholder="Method | Details">
     <button class="btn" onclick="doAdm('add_pay')">ADD PAYMENT</button>
-    <div id="adm-pay-list"></div>
-    <div id="adm-items-list"></div>
+    <div id="adm-pay-list" style="margin-top:10px"></div>
+    <div id="adm-items-list" style="margin-top:10px"></div>
 </div>
 
 <nav class="nav">
@@ -76,25 +73,26 @@
 <script>
     const tg = window.Telegram.WebApp;
     const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw";
-    const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
     let allI = [], allP = [], cart = [], base64Img = null;
 
     if([5859388511, 6920293690].includes(tg.initDataUnsafe.user?.id)) document.getElementById("adm-btn").style.display="block";
-
-    async function load() {
-        const r = await fetch(API + "/get_all", { headers: {"ngrok-skip-browser-warning":"1"} });
-        const d = await r.json(); allI = d.items||[]; allP = d.payments||[];
-        renderAdmin(); renderCheckout();
-    }
 
     function previewImg(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                base64Img = e.target.result;
-                const preview = document.getElementById("img-preview");
-                preview.src = e.target.result;
-                preview.style.display = "block";
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const max = 800; let w = img.width, h = img.height;
+                    if (w > max) { h *= max / w; w = max; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    base64Img = canvas.toDataURL('image/jpeg', 0.6);
+                    const p = document.getElementById("img-preview");
+                    p.src = base64Img; p.style.display = "block";
+                };
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -105,17 +103,15 @@
         el.value = t; document.body.appendChild(el);
         el.select(); document.execCommand("copy");
         document.body.removeChild(el);
-        tg.showAlert("COPIED: " + t);
+        tg.showAlert("COPIED");
     }
 
     async function confirmOrder() {
         const selIdx = document.getElementById("pay-sel").value;
         if(!selIdx) return tg.showAlert("SELECT PAYMENT METHOD");
-        if(!base64Img) return tg.showAlert("PLEASE UPLOAD RECEIPT IMAGE");
-
-        document.getElementById("send-btn").innerText = "SENDING...";
-        document.getElementById("send-btn").disabled = true;
-
+        if(!base64Img) return tg.showAlert("UPLOAD RECEIPT IMAGE");
+        const btn = document.getElementById("send-btn");
+        btn.innerText = "SENDING..."; btn.disabled = true;
         const total = cart.reduce((s, i) => s + parseFloat(i.p), 0);
         await fetch(API + "/send_order", {
             method:"POST", headers:{"Content-Type":"application/json"},
@@ -126,17 +122,13 @@
                 image: base64Img
             })
         });
-
-        tg.showAlert("SUCCESS! ORDER SENT TO ADMIN.");
-        cart = []; document.getElementById("c-count").innerText = "0";
-        document.getElementById("checkout-sec").style.display = "none";
-        base64Img = null;
+        tg.showAlert("ORDER SENT");
         tg.close();
     }
 
     function addToCart(u, p) {
         if(cart.find(x => x.u === u)) return;
-        audio.play(); cart.push({u, p});
+        cart.push({u, p});
         document.getElementById("c-count").innerText = cart.length;
         renderCart();
     }
@@ -165,6 +157,12 @@
         }).join("");
     }
 
+    async function load() {
+        const r = await fetch(API + "/get_all", { headers: {"ngrok-skip-browser-warning":"1"} });
+        const d = await r.json(); allI = d.items||[]; allP = d.payments||[];
+        renderAdmin(); renderCheckout();
+    }
+
     function tab(id, el) {
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         document.getElementById(id).classList.add("active");
@@ -172,7 +170,6 @@
         el.classList.add("active-nav");
         load();
     }
-
     function backToCats() { document.getElementById("cat-menu").style.display="block"; document.getElementById("items-view").style.display="none"; }
     function renderCheckout() { const sel = document.getElementById("pay-sel"); sel.innerHTML = '<option value="">SELECT PAYMENT</option>' + allP.map((p, i) => `<option value="${i}">${p.split("|")[0]}</option>`).join(""); }
     function showPay(i) { if(i==="") { document.getElementById("pay-details").style.display="none"; return; } document.getElementById("pay-details").style.display="block"; document.getElementById("pay-num").innerText = allP[i].split("|")[1]?.trim(); }
