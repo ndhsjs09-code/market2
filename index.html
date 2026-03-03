@@ -6,241 +6,75 @@
     <title>MW STORE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* إعدادات الألوان الفخمة لبراند MW */
         :root { 
             --mw-gold: #d4af37; 
             --mw-dark: #050505; 
             --mw-card: #0f0f0f; 
             --mw-border: #1a1a1a;
-            --mw-glow: rgba(212, 175, 55, 0.2);
         }
-
         body { 
-            background: var(--mw-dark); 
-            color: #e0e0e0; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            padding: 15px; 
-            padding-bottom: 110px; 
-            margin:0;
+            background: var(--mw-dark); color: #e0e0e0; font-family: sans-serif; 
+            padding: 15px; padding-bottom: 110px; margin:0;
             background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
         }
-
         .tab { display: none; } .active { display: block; }
-
-        /* ديكور الهيدر */
         .header-container {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid var(--mw-gold);
-            position: relative;
-            background: rgba(212, 175, 55, 0.05);
-            border-radius: 4px;
+            text-align: center; margin-bottom: 30px; padding: 20px;
+            border: 1px solid var(--mw-gold); background: rgba(212, 175, 55, 0.05);
         }
-        .header-title { 
-            color: var(--mw-gold); 
-            font-weight: 900; 
-            font-size: 28px; 
-            letter-spacing: 5px;
-            margin: 0;
-            text-shadow: 0 0 10px var(--mw-glow);
-        }
-        .header-subtitle {
-            font-size: 10px;
-            color: #555;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 5px;
-        }
-
-        /* ديكور الكروت */
+        .header-title { color: var(--mw-gold); font-weight: 900; font-size: 28px; letter-spacing: 5px; margin: 0; }
         .cat-card { 
-            background: var(--mw-card); 
-            padding: 25px; 
-            border-radius: 0; 
-            margin-bottom: 15px; 
-            text-align: center; 
-            border: 1px solid var(--mw-border); 
-            border-left: 4px solid var(--mw-gold);
-            font-size: 16px; 
-            font-weight: bold; 
-            color: #fff;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
+            background: var(--mw-card); padding: 25px; margin-bottom: 15px; 
+            text-align: center; border-left: 4px solid var(--mw-gold); border-top: 1px solid var(--mw-border);
+            font-size: 16px; font-weight: bold; color: #fff;
         }
-        .cat-card:active { background: #151515; transform: scale(0.98); }
-        .cat-card::after {
-            content: "MW";
-            position: absolute;
-            right: -10px;
-            bottom: -10px;
-            font-size: 40px;
-            color: rgba(255,255,255,0.03);
-            font-weight: 900;
-        }
-
         .card { 
-            background: var(--mw-card); 
-            border: 1px solid var(--mw-border); 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+            background: var(--mw-card); border: 1px solid var(--mw-border); 
+            padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-
-        /* الأزرار */
-        .btn { 
-            background: var(--mw-gold); 
-            color: #000; 
-            border: none; 
-            padding: 16px; 
-            font-weight: 900; 
-            font-size: 14px; 
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .btn-small { 
-            background: transparent; 
-            color: var(--mw-gold); 
-            padding: 8px 15px; 
-            border: 1px solid var(--mw-gold); 
-            font-weight: bold; 
-            font-size: 11px; 
-        }
-        .btn-del { 
-            background: #802d2d; 
-            color: #fff; 
-            padding: 6px 12px; 
-            border: none; 
-            font-size: 10px; 
-        }
-
-        /* ديكور لوحة التحكم */
-        .admin-section { 
-            background: #0a0a0a; 
-            padding: 15px; 
-            margin-top: 15px; 
-            border: 1px solid #1a1a1a; 
-            border-top: 2px solid var(--mw-gold);
-        }
-        h3 { 
-            font-size: 12px; 
-            color: var(--mw-gold); 
-            margin-bottom: 15px; 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-        }
-        h3::before { content: "[ "; color: #444; }
-        h3::after { content: " ]"; color: #444; }
-
-        /* السلة والدفع */
-        .total-box { 
-            background: #000; 
-            padding: 20px; 
-            border: 1px double var(--mw-gold); 
-            margin: 20px 0; 
-            display: flex; 
-            justify-content: space-between; 
-            font-weight: 900;
-            color: var(--mw-gold);
-        }
-
-        /* التنقل السفلي */
-        .nav { 
-            position: fixed; 
-            bottom: 0; left: 0; width: 100%; 
-            background: #000; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px 0; 
-            border-top: 1px solid var(--mw-border); 
-            z-index: 1000;
-        }
-        .nav-item { color: #444; cursor: pointer; font-weight: 900; font-size: 12px; letter-spacing: 1px; } 
-        .active-nav { color: var(--mw-gold); text-shadow: 0 0 5px var(--mw-glow); }
-
-        input, textarea, select { 
-            width: 100%; padding: 12px; margin: 8px 0; 
-            background: #080808; color: #fff; 
-            border: 1px solid #222; border-radius: 0; 
-            box-sizing: border-box; 
-        }
-        input:focus { border-color: var(--mw-gold); outline: none; }
+        .btn { background: var(--mw-gold); color: #000; border: none; padding: 16px; font-weight: 900; width: 100%; border-radius: 4px; }
+        .btn-small { background: transparent; color: var(--mw-gold); padding: 8px 15px; border: 1px solid var(--mw-gold); border-radius: 4px; cursor: pointer; }
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--mw-border); z-index: 1000; }
+        .nav-item { color: #444; cursor: pointer; font-weight: 900; font-size: 12px; } 
+        .active-nav { color: var(--mw-gold); }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #080808; color: #fff; border: 1px solid #222; box-sizing: border-box; }
+        .total-box { background: #000; padding: 20px; border: 1px double var(--mw-gold); margin: 20px 0; display: flex; justify-content: space-between; color: var(--mw-gold); font-weight: 900; }
     </style>
 </head>
 <body>
 
 <div id="store-tab" class="tab active">
-    <div class="header-container">
-        <div class="header-title">MW STORE</div>
-        <div class="header-subtitle">PREMIUM DIGITAL SERVICES</div>
-    </div>
-    
+    <div class="header-container"><div class="header-title">MW STORE</div></div>
     <div id="cat-menu">
-        <div class="cat-card" onclick="showCat('3C/L')">3C / L SERVICE</div>
-        <div class="cat-card" onclick="showCat('4CC/LL')">4CC / LL SERVICE</div>
+        <div class="cat-card" onclick="showCat('3C/L')">3C / L</div>
+        <div class="cat-card" onclick="showCat('4CC/LL')">4CC / LL</div>
         <div class="cat-card" onclick="showCat('Double/Triple')">DOUBLE / TRIPLE</div>
         <div class="cat-card" onclick="showCat('4C/L Same')">4C / L SAME</div>
-        <div class="cat-card" onclick="showCat('4C/L')">4C / L BASIC</div>
-        <div class="cat-card" onclick="showCat('Others')">OTHER SERVICES</div>
+        <div class="cat-card" onclick="showCat('4C/L')">4C / L</div>
+        <div class="cat-card" onclick="showCat('Others')">OTHERS</div>
     </div>
-
     <div id="items-view" style="display:none">
-        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">RETURN TO MENU</button>
+        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK</button>
         <div id="items-list"></div>
     </div>
 </div>
 
 <div id="cart-tab" class="tab">
-    <div class="header-container">
-        <div class="header-title">CHECKOUT</div>
-    </div>
+    <div class="header-container"><div class="header-title">CART</div></div>
     <div id="cart-list"></div>
     <div id="cart-footer" style="display:none">
-        <div class="total-box"><span>SUBTOTAL:</span><span>$<span id="total-price">0.00</span></span></div>
-        <select id="pay-sel" onchange="updatePayInfo()">
-            <option disabled selected>SELECT PAYMENT METHOD</option>
-        </select>
-        <div id="pay-details-container" style="display:none;">
-            <div id="pay-details" class="pay-info" style="padding:15px; background:#0a0a0a; border:1px solid #222; margin:10px 0; text-align:center; color:var(--mw-gold);"></div>
-            <button class="btn-small" onclick="copyPay()" style="width:100%; margin-bottom:10px;">COPY ADDRESS</button>
-        </div>
+        <div class="total-box"><span>TOTAL:</span><span>$<span id="total-price">0.00</span></span></div>
+        <select id="pay-sel"><option disabled selected>SELECT PAYMENT</option></select>
+        <p style="font-size: 12px; color: var(--mw-gold); text-align: center;">Upload screenshot of payment receipt</p>
         <input type="file" id="receipt" accept="image/*">
         <button class="btn" id="send-btn" onclick="sendOrder()">CONFIRM ORDER</button>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
-    <div class="header-container">
-        <div class="header-title">MW ADMIN</div>
-    </div>
-    
-    <div class="admin-section">
-        <h3>Inventory Upload</h3>
-        <select id="admin-cat">
-            <option value="Auto">Smart Detection</option>
-            <option value="3C/L">3C/L</option><option value="4CC/LL">4CC/LL</option>
-            <option value="Double/Triple">Double/Triple</option><option value="Others">Others</option>
-        </select>
-        <textarea id="admin-in" rows="4" placeholder="format: user|pass|price"></textarea>
-        <button class="btn" onclick="addAccs()">ADD TO DATABASE</button>
-    </div>
-
-    <div class="admin-section">
-        <h3>Finances</h3>
-        <input id="p-name" placeholder="Method (e.g. ZainCash)">
-        <input id="p-val" placeholder="Wallet ID / Details">
-        <button class="btn" onclick="addPay()">SAVE METHOD</button>
-        <div id="admin-pay-list" style="margin-top:15px"></div>
-    </div>
-
-    <div id="admin-items-list" style="margin-top:20px"></div>
+    <div class="header-container"><div class="header-title">ADMIN MW</div></div>
+    <textarea id="admin-in" rows="6" placeholder="Format: user|pass|price (One per line)"></textarea>
+    <button class="btn" onclick="addAccs()">ADD TO ABUJASIM FOLDER</button>
 </div>
 
 <nav class="nav">
@@ -251,22 +85,20 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    // تم ربط الرابط الخاص بك مباشرة
-    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev"; 
-    const ADMIN_ID = 5939498558;
+    // الرابط من صورة الـ ngrok الخاصة بك
+    const API = "https://laquita-unperturbed-altagracia.ngrok-free.app/mw"; 
+    const ADMIN_IDS = [5859388511, 6920293690];
+    
     let cart = [], allI = [], allP = [];
 
-    const addSound = new Audio('https://www.soundjay.com/buttons/sounds/button-37.mp3');
-    const delSound = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
-
-    if(tg.initDataUnsafe.user?.id == ADMIN_ID) document.getElementById('admin-btn').style.display='block';
+    // إظهار زر الإدمن للأشخاص المحددين فقط
+    if(ADMIN_IDS.includes(tg.initDataUnsafe.user?.id)) document.getElementById('admin-btn').style.display='block';
 
     function tab(id, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
         el.classList.add('active-nav');
-        if(id === 'admin-tab') { renderAdminItems(); renderAdminPayments(); }
     }
 
     async function load() {
@@ -274,38 +106,37 @@
             const r = await fetch(`${API}/get_all`, { headers: { "ngrok-skip-browser-warning": "1" } });
             const d = await r.json();
             allI = d.items; allP = d.payments;
-            document.getElementById('pay-sel').innerHTML = '<option disabled selected>SELECT PAYMENT METHOD</option>' + 
+            document.getElementById('pay-sel').innerHTML = '<option disabled selected>SELECT PAYMENT</option>' + 
                 allP.map(p => `<option value="${p.split('|')[0]}">${p.split('|')[0]}</option>`).join('');
-        } catch(e) { console.log("system error"); }
+        } catch(e) { console.error("Server connection failed"); }
     }
 
     function showCat(c) {
         document.getElementById('cat-menu').style.display='none';
         document.getElementById('items-view').style.display='block';
         const filtered = allI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = filtered.length === 0 ? '<p style="text-align:center; color:#444; padding:40px;">NO ASSETS AVAILABLE</p>' : filtered.map(i => `
+        document.getElementById('items-list').innerHTML = filtered.length ? filtered.map(i => `
             <div class="card">
-                <div><b style="color:var(--mw-gold)">@${i.u}</b><br><small style="color:#666">PRICE: $${i.p}</small></div>
-                <button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">PURCHASE</button>
-            </div>`).join('');
+                <div><b style="color:var(--mw-gold)">@${i.u}</b><br><small>$${i.p}</small></div>
+                <button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button>
+            </div>`).join('') : '<p style="text-align:center">Empty Category</p>';
     }
 
     function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
 
     function addToCart(u,p) {
-        if(cart.find(x => x.u === u)) return;
-        cart.push({u,p}); 
-        addSound.play();
-        renderCart();
-        document.getElementById('count').innerText = cart.length;
-        tg.HapticFeedback.impactOccurred('medium');
+        if(!cart.find(x => x.u === u)) {
+            cart.push({u,p});
+            document.getElementById('count').innerText = cart.length;
+            renderCart();
+        }
     }
 
     function renderCart() {
         const list = document.getElementById('cart-list');
-        if(cart.length==0) { list.innerHTML="<p style='text-align:center; padding:40px; color:#444;'>CART IS EMPTY</p>"; document.getElementById('cart-footer').style.display='none'; }
+        if(cart.length==0) { list.innerHTML="<p style='text-align:center;'>Your cart is empty</p>"; document.getElementById('cart-footer').style.display='none'; }
         else {
-            list.innerHTML = cart.map(i => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-del" onclick="removeFromCart('${i.u}')">REMOVE</button></div>`).join('');
+            list.innerHTML = cart.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red;" onclick="removeFromCart('${i.u}')">REMOVE</button></div>`).join('');
             document.getElementById('cart-footer').style.display='block';
             document.getElementById('total-price').innerText = cart.reduce((s,i) => s + parseFloat(i.p), 0).toFixed(2);
         }
@@ -313,75 +144,47 @@
 
     function removeFromCart(u) {
         cart = cart.filter(i => i.u !== u);
-        delSound.play();
-        renderCart();
         document.getElementById('count').innerText = cart.length;
-    }
-
-    function updatePayInfo() {
-        const val = document.getElementById('pay-sel').value;
-        const method = allP.find(p => p.startsWith(val + '|'));
-        if(method) {
-            document.getElementById('pay-details').innerText = method.split('|')[1];
-            document.getElementById('pay-details-container').style.display = 'block';
-        }
-    }
-
-    function copyPay() {
-        navigator.clipboard.writeText(document.getElementById('pay-details').innerText);
-        tg.showAlert("Details Copied to Clipboard");
+        renderCart();
     }
 
     async function sendOrder() {
         const f = document.getElementById('receipt').files[0];
-        if(!f) return tg.showAlert("Please upload payment receipt");
+        const payMethod = document.getElementById('pay-sel').value;
+        if(!f || payMethod === "SELECT PAYMENT") return tg.showAlert("Please select payment and upload receipt");
+        
         const btn = document.getElementById('send-btn');
         btn.disabled = true; btn.innerText = "PROCESSING...";
-        const reader = new FileReader(); 
+        
+        const reader = new FileReader();
         reader.readAsDataURL(f);
         reader.onload = async () => {
             try {
-                const r = await fetch(`${API}/submit_order`, {
+                const r = await fetch(`${API}/submit`, {
                     method:'POST', headers:{'Content-Type':'application/json'},
                     body:JSON.stringify({
-                        user_id:tg.initDataUnsafe.user.id, user_name:tg.initDataUnsafe.user.username || "User",
-                        items:cart, method:document.getElementById('pay-sel').value,
+                        user_id:tg.initDataUnsafe.user.id,
+                        items:cart, method:payMethod,
                         image:reader.result, total:document.getElementById('total-price').innerText
                     })
                 });
-                if(r.ok) {
-                    tg.showAlert("Order Sent. Waiting for MW System Approval.", () => { tg.close(); });
-                } else {
-                    tg.showAlert("Error Processing Order.");
-                    btn.disabled = false; btn.innerText = "CONFIRM ORDER";
-                }
-            } catch(e) {
-                tg.showAlert("Network Connection Lost");
-                btn.disabled = false; btn.innerText = "CONFIRM ORDER";
-            }
+                if(r.ok) tg.showAlert("Order sent! Wait for admin approval.", () => tg.close());
+                else { tg.showAlert("Server Error"); btn.disabled = false; btn.innerText = "CONFIRM ORDER"; }
+            } catch(e) { tg.showAlert("Connection Error"); btn.disabled = false; }
         }
     }
 
-    // وظائف السيستم للأدمن
-    function renderAdminItems() {
-        document.getElementById('admin-items-list').innerHTML = '<h3>Current Inventory</h3>' + allI.map(i => `
-            <div class="card" style="font-size:11px;"><span>@${i.u}</span><button class="btn-del" onclick="delUser('${i.u}')">DELETE</button></div>`).join('');
-    }
-    function renderAdminPayments() {
-        document.getElementById('admin-pay-list').innerHTML = allP.map(p => `
-            <div class="card" style="font-size:11px;"><span>${p.split('|')[0]}</span><button class="btn-del" onclick="delPay('${p}')">REMOVE</button></div>`).join('');
-    }
     async function addAccs() {
-        await fetch(`${API}/admin/add`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:ADMIN_ID, data:document.getElementById('admin-in').value, cat:document.getElementById('admin-cat').value})});
-        document.getElementById('admin-in').value=""; load(); tg.showAlert("Database Updated");
+        const data = document.getElementById('admin-in').value;
+        if(!data) return;
+        await fetch(`${API}/admin/add`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, data:data})
+        });
+        tg.showAlert("Added to abujasim/inventory.txt"); 
+        document.getElementById('admin-in').value = "";
+        load();
     }
-    async function addPay() {
-        const m = document.getElementById('p-name').value + '|' + document.getElementById('p-val').value;
-        await fetch(`${API}/admin/add_pay`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:ADMIN_ID, method:m})});
-        document.getElementById('p-name').value=""; document.getElementById('p-val').value=""; load();
-    }
-    async function delUser(u) { await fetch(`${API}/admin/delete_user`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:ADMIN_ID, username:u})}); load(); setTimeout(renderAdminItems, 400); }
-    async function delPay(m) { await fetch(`${API}/admin/delete_pay`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:ADMIN_ID, method:m})}); load(); setTimeout(renderAdminPayments, 400); }
 
     tg.expand(); load();
 </script>
