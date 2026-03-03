@@ -9,17 +9,17 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #0f0f0f; }
         body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
         .tab { display: none; } .active { display: block; }
-        .mw-tag { color: var(--gold); font-weight: 900; text-align: center; display: block; margin-bottom: 5px; font-size: 14px; }
-        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; background: rgba(212,175,55,0.03); }
-        .cat-card { background: var(--card); padding: 22px; margin-bottom: 10px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .mw-tag { color: var(--gold); font-weight: 900; text-align: center; display: block; margin-bottom: 5px; }
+        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; }
+        .cat-card { background: var(--card); padding: 22px; margin-bottom: 10px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; }
         .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 5px; }
-        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; border-radius: 4px; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; }
+        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 6px; box-sizing: border-box; }
         .admin-sec { background: #0a0a0a; padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px solid #1a1a1a; }
-        h3 { font-size: 11px; color: var(--gold); margin-bottom: 8px; letter-spacing: 1px; }
+        h3 { font-size: 11px; color: var(--gold); margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -30,11 +30,10 @@
     <div id="cat-menu">
         <div class="cat-card" onclick="showCat('3C/L')">3C / L</div>
         <div class="cat-card" onclick="showCat('4CC/LL')">4CC / LL</div>
-        <div class="cat-card" onclick="showCat('Double/Triple')">DOUBLE / TRIPLE</div>
         <div class="cat-card" onclick="showCat('Others')">OTHERS</div>
     </div>
     <div id="items-view" style="display:none">
-        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK TO LIST</button>
+        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK</button>
         <div id="items-list"></div>
     </div>
 </div>
@@ -43,26 +42,21 @@
     <div class="header-title">MW CART</div>
     <div id="cart-list"></div>
     <div id="cart-footer" style="display:none; text-align:center; margin-top:20px;">
-        <button class="btn">PROCEED TO PAYMENT</button>
+        <button class="btn">CHECKOUT</button>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
     <div class="header-title">MW SYSTEM</div>
     <div class="admin-sec">
-        <h3>ADD NEW ITEMS</h3>
-        <select id="mw-cat-sel">
-            <option value="3C/L">3C/L</option>
-            <option value="4CC/LL">4CC/LL</option>
-            <option value="Double/Triple">Double/Triple</option>
-            <option value="Others">Others</option>
-        </select>
+        <h3>ADD ITEMS</h3>
+        <select id="mw-cat-sel"><option value="3C/L">3C/L</option><option value="Others">Others</option></select>
         <textarea id="mw-in" rows="4" placeholder="user:pass:price"></textarea>
-        <button class="btn" onclick="mwAdminAction('add_users')">SAVE ACCOUNTS</button>
+        <button class="btn" onclick="mwAdminAction('add_users')">SAVE</button>
     </div>
     <div class="admin-sec">
-        <h3>MANAGE INVENTORY</h3>
-        <div id="mw-admin-list"></div>
+        <h3>MANAGE</h3>
+        <div id="mw-admin-list">Loading...</div>
     </div>
 </div>
 
@@ -80,6 +74,14 @@
 
     if(ADMIN_MW.includes(tg.initDataUnsafe.user?.id)) document.getElementById('admin-btn').style.display='block';
 
+    async function load() {
+        try {
+            const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
+            const d = await r.json(); mwI = d.items || [];
+            if(document.getElementById('admin-tab').classList.contains('active')) renderMwAdmin();
+        } catch(e) { console.error("Load error"); }
+    }
+
     function tab(id, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -89,13 +91,6 @@
         if(id==='cart-tab') renderMwCart();
     }
 
-    async function load() {
-        try {
-            const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
-            const d = await r.json(); mwI = d.items || [];
-        } catch(e) { console.error("Load error"); }
-    }
-
     async function mwAdminAction(action) {
         const content = document.getElementById('mw-in').value;
         const cat = document.getElementById('mw-cat-sel').value;
@@ -103,9 +98,7 @@
             method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
             body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content, cat})
         });
-        tg.showAlert("Success!");
-        document.getElementById('mw-in').value=""; 
-        load(); setTimeout(renderMwAdmin, 500);
+        document.getElementById('mw-in').value=""; load();
     }
 
     async function delMw(u) {
@@ -113,22 +106,19 @@
             method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
             body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action:'del_user', content:u})
         });
-        load(); setTimeout(renderMwAdmin, 500);
+        load();
     }
 
     function renderMwAdmin() {
-        document.getElementById('mw-admin-list').innerHTML = mwI.map(i => `
-            <div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="delMw('${i.u}')">DEL</button></div>`).join('');
+        const list = document.getElementById('mw-admin-list');
+        if(mwI.length === 0) { list.innerHTML = "Inventory empty."; return; }
+        list.innerHTML = mwI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="delMw('${i.u}')">DEL</button></div>`).join('');
     }
 
-    function addToCart(u, p) {
-        cart.push({u, p});
-        document.getElementById('mw-cart-count').innerText = cart.length;
-    }
-
+    function addToCart(u, p) { cart.push({u, p}); document.getElementById('mw-cart-count').innerText = cart.length; }
     function renderMwCart() {
         const list = document.getElementById('cart-list');
-        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>Empty Cart</p>"; document.getElementById('cart-footer').style.display='none'; return; }
+        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>Empty</p>"; return; }
         list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" style="color:red; border-color:red" onclick="cart.splice(${idx},1);renderMwCart();">X</button></div>`).join('');
         document.getElementById('cart-footer').style.display = 'block';
     }
@@ -136,10 +126,8 @@
     function showCat(c) {
         document.getElementById('cat-menu').style.display='none'; document.getElementById('items-view').style.display='block';
         const fil = mwI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = fil.length === 0 ? "<p style='text-align:center'>Empty Section</p>" : fil.map(i => `
-            <div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button></div>`).join('');
+        document.getElementById('items-list').innerHTML = fil.map(i => `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button></div>`).join('');
     }
-
     function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
     tg.expand(); load();
 </script>
