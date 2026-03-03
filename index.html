@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --mw-gold: #d4af37; --mw-dark: #050505; --mw-card: #0f0f0f; --mw-border: #1a1a1a; }
-        body { background: var(--mw-dark); color: #e0e0e0; font-family: sans-serif; padding: 15px; padding-bottom: 110px; margin:0; background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%); }
+        body { background: var(--mw-dark); color: #e0e0e0; font-family: sans-serif; padding: 15px; padding-bottom: 110px; margin:0; }
         .tab { display: none; } .active { display: block; }
         .header-container { text-align: center; margin-bottom: 30px; padding: 20px; border: 1px solid var(--mw-gold); background: rgba(212, 175, 55, 0.05); }
         .header-title { color: var(--mw-gold); font-weight: 900; font-size: 28px; letter-spacing: 5px; margin: 0; }
@@ -19,10 +19,8 @@
         .nav-item { color: #444; cursor: pointer; font-weight: 900; font-size: 12px; } 
         .active-nav { color: var(--mw-gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #080808; color: #fff; border: 1px solid #222; box-sizing: border-box; }
-        .total-box { background: #000; padding: 20px; border: 1px double var(--mw-gold); margin: 20px 0; display: flex; justify-content: space-between; color: var(--mw-gold); font-weight: 900; }
-        /* صندوق الدفع والنسخ */
-        .pay-info-box { background: #111; border: 1px dashed var(--mw-gold); padding: 15px; margin: 10px 0; text-align: center; border-radius: 8px; display: none; }
-        .copy-badge { background: var(--mw-gold); color: #000; padding: 2px 8px; font-size: 10px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-weight: bold; }
+        .pay-info-box { background: #111; border: 1px dashed var(--mw-gold); padding: 15px; margin: 10px 0; text-align: center; display: none; }
+        .copy-badge { background: var(--mw-gold); color: #000; padding: 2px 8px; font-size: 10px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -38,7 +36,7 @@
         <div class="cat-card" onclick="showCat('Others')">OTHERS</div>
     </div>
     <div id="items-view" style="display:none">
-        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK</button>
+        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">BACK</button>
         <div id="items-list"></div>
     </div>
 </div>
@@ -47,35 +45,29 @@
     <div class="header-container"><div class="header-title">CART</div></div>
     <div id="cart-list"></div>
     <div id="cart-footer" style="display:none">
-        <div class="total-box"><span>TOTAL:</span><span>$<span id="total-price">0.00</span></span></div>
-        
-        <label style="font-size: 12px; color: var(--mw-gold);">SELECT PAYMENT METHOD:</label>
+        <div style="padding:15px; border:1px solid var(--mw-gold); margin-bottom:15px; text-align:center;">
+            TOTAL: $<span id="total-price">0.00</span>
+        </div>
         <select id="pay-sel" onchange="updatePayDetails()"></select>
-        
         <div id="pay-info-box" class="pay-info-box">
-            <span id="pay-text" style="color:#fff; font-weight:bold;"></span>
+            <span id="pay-text"></span>
             <span class="copy-badge" onclick="copyPay()">COPY</span>
         </div>
-
-        <p style="font-size: 12px; color: var(--mw-gold); text-align: center; margin-top:15px;">Upload screenshot of payment receipt</p>
-        <input type="file" id="receipt" accept="image/*">
-        <button class="btn" id="send-btn" onclick="sendOrder()">CONFIRM ORDER</button>
+        <input type="file" id="receipt" accept="image/*" style="margin-top:15px">
+        <button class="btn" onclick="sendOrder()">CONFIRM ORDER</button>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
-    <div class="header-container"><div class="header-title">ADMIN PANEL</div></div>
-    <div style="margin-bottom:20px; border-bottom:1px solid #222; padding-bottom:15px;">
-        <p style="color:var(--mw-gold); font-size:14px;">ADD USERS (user|pass|price)</p>
-        <textarea id="admin-in" rows="4"></textarea>
-        <button class="btn" onclick="adminAction('add_users', 'admin-in')">ADD</button>
-    </div>
-    <div>
-        <p style="color:var(--mw-gold); font-size:14px;">ADD PAYMENT (Method | Detail)</p>
-        <input type="text" id="pay-in" placeholder="ZainCash | 078xxxx">
-        <button class="btn" onclick="adminAction('add_pay', 'pay-in')">ADD</button>
-        <div id="current-pays" style="margin-top:15px"></div>
-    </div>
+    <div class="header-container"><div class="header-title">SYSTEM</div></div>
+    <p style="color:var(--mw-gold)">ADD USERS</p>
+    <textarea id="admin-in" rows="4" placeholder="user|pass|price"></textarea>
+    <button class="btn" onclick="adminAction('add_users', 'admin-in')">ADD</button>
+    
+    <p style="color:var(--mw-gold); margin-top:20px">ADD PAYMENT</p>
+    <input type="text" id="pay-in" placeholder="Method | Details">
+    <button class="btn" onclick="adminAction('add_pay', 'pay-in')">ADD</button>
+    <div id="current-pays" style="margin-top:10px"></div>
 </div>
 
 <nav class="nav">
@@ -86,7 +78,8 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    const API = "https://laquita-unperturbed-altagracia.ngrok-free.app/mw"; 
+    // الرابط الجديد من صورتك
+    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw"; 
     const ADMIN_IDS = [5859388511, 6920293690];
     
     let cart = [], allI = [], allP = [];
@@ -102,94 +95,84 @@
 
     async function load() {
         try {
-            const r = await fetch(`${API}/get_all`, { headers: { "ngrok-skip-browser-warning": "1" } });
+            const r = await fetch(`${API}/get_all`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
             const d = await r.json();
             allI = d.items; allP = d.payments;
             
-            document.getElementById('pay-sel').innerHTML = '<option disabled selected>CHOOSE METHOD</option>' + 
-                allP.map(p => `<option value="${p}">${p.split('|')[0].strip()}</option>`).join('');
+            document.getElementById('pay-sel').innerHTML = '<option disabled selected>SELECT PAYMENT</option>' + 
+                allP.map(p => `<option value="${p}">${p.split('|')[0].trim()}</option>`).join('');
 
             document.getElementById('current-pays').innerHTML = allP.map(p => `
                 <div class="card" style="font-size:11px">
                     <span>${p}</span>
-                    <button class="btn-small" style="color:red; border-color:red; padding:2px 8px" onclick="adminAction('del_pay', '', '${p}')">DEL</button>
+                    <button class="btn-small" style="color:red; border:none;" onclick="adminAction('del_pay', '', '${p}')">DEL</button>
                 </div>`).join('');
-        } catch(e) { console.error(e); }
+        } catch(e) { console.log(e); }
     }
 
     function updatePayDetails() {
         const val = document.getElementById('pay-sel').value;
-        const box = document.getElementById('pay-info-box');
-        const txt = document.getElementById('pay-text');
         if(val.includes('|')) {
-            const details = val.split('|')[1].trim();
-            txt.innerText = details;
-            box.style.display = 'block';
-        } else { box.style.display = 'none'; }
+            document.getElementById('pay-text').innerText = val.split('|')[1].trim();
+            document.getElementById('pay-info-box').style.display = 'block';
+        }
     }
 
     function copyPay() {
-        const txt = document.getElementById('pay-text').innerText;
-        navigator.clipboard.writeText(txt);
-        tg.showAlert("Copied: " + txt);
+        navigator.clipboard.writeText(document.getElementById('pay-text').innerText);
+        tg.showAlert("Copied!");
     }
 
-    async function adminAction(action, inputId, directContent = null) {
-        const content = directContent || document.getElementById(inputId).value;
+    async function adminAction(action, inputId, direct = null) {
+        const content = direct || document.getElementById(inputId).value;
         if(!content) return;
-        await fetch(`${API}/admin/manage`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, action, content })
-        });
-        tg.showAlert("Done!");
-        if(inputId) document.getElementById(inputId).value = "";
-        load();
+        try {
+            const r = await fetch(`${API}/admin/manage`, {
+                method:'POST',
+                headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning': 'true'},
+                body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, action, content })
+            });
+            const res = await r.json();
+            if(res.status === "ok") { tg.showAlert("Success!"); load(); if(inputId) document.getElementById(inputId).value=""; }
+        } catch(e) { tg.showAlert("Error! Check Server."); }
     }
 
-    // --- وظائف السلة والمتجر (نفس السابقة) ---
     function showCat(c) {
         document.getElementById('cat-menu').style.display='none';
         document.getElementById('items-view').style.display='block';
         const filtered = allI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = filtered.length ? filtered.map(i => `
+        document.getElementById('items-list').innerHTML = filtered.map(i => `
             <div class="card">
-                <div><b style="color:var(--mw-gold)">@${i.u}</b><br><small>$${i.p}</small></div>
+                <div><b>@${i.u}</b><br><small>$${i.p}</small></div>
                 <button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button>
-            </div>`).join('') : '<p style="text-align:center">No Items</p>';
+            </div>`).join('');
     }
+
     function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
-    function addToCart(u,p) {
-        if(!cart.find(x => x.u === u)) {
-            cart.push({u,p});
-            document.getElementById('count').innerText = cart.length;
-            renderCart();
-        }
-    }
+    function addToCart(u,p) { cart.push({u,p}); document.getElementById('count').innerText = cart.length; renderCart(); }
+    
     function renderCart() {
         const list = document.getElementById('cart-list');
-        if(cart.length==0) { list.innerHTML="<p style='text-align:center;'>Empty</p>"; document.getElementById('cart-footer').style.display='none'; }
+        if(cart.length==0) { list.innerHTML="Empty"; document.getElementById('cart-footer').style.display='none'; }
         else {
-            list.innerHTML = cart.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border:none;" onclick="removeFromCart('${i.u}')">X</button></div>`).join('');
+            list.innerHTML = cart.map(i => `<div class="card"><span>@${i.u}</span></div>`).join('');
             document.getElementById('cart-footer').style.display='block';
             document.getElementById('total-price').innerText = cart.reduce((s,i) => s + parseFloat(i.p), 0).toFixed(2);
         }
     }
-    function removeFromCart(u) {
-        cart = cart.filter(i => i.u !== u);
-        document.getElementById('count').innerText = cart.length;
-        renderCart();
-    }
+
     async function sendOrder() {
         const f = document.getElementById('receipt').files[0];
-        if(!f) return tg.showAlert("Upload receipt");
+        if(!f) return tg.showAlert("Upload Receipt");
         const reader = new FileReader();
         reader.readAsDataURL(f);
         reader.onload = async () => {
-            const r = await fetch(`${API}/submit`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, items:cart, method:document.getElementById('pay-sel').value.split('|')[0], image:reader.result, total:document.getElementById('total-price').innerText })
+            await fetch(`${API}/submit`, {
+                method:'POST',
+                headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning': 'true'},
+                body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, items:cart, method:document.getElementById('pay-sel').value, image:reader.result, total:document.getElementById('total-price').innerText })
             });
-            if(r.ok) tg.showAlert("Order Sent!", () => tg.close());
+            tg.showAlert("Order Sent!", () => tg.close());
         }
     }
 
