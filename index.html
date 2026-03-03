@@ -9,16 +9,17 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #0f0f0f; }
         body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
         .tab { display: none; } .active { display: block; }
-        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; }
+        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; text-transform: uppercase; }
         .cat-card { background: var(--card); padding: 18px; margin-bottom: 8px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; color: var(--gold); }
-        .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; }
-        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; border-radius: 3px; }
+        .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; text-transform: uppercase; }
+        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; border-radius: 2px; }
+        .btn-small:disabled { border-color: #333; color: #444; cursor: not-allowed; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 4px; box-sizing: border-box; text-align: center; }
-        .admin-sec { background: #0a0a0a; padding: 12px; border-radius: 6px; margin-top: 15px; border: 1px solid #1a1a1a; }
-        .copy-box { background: #000; padding: 12px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; }
+        .admin-sec { background: #0a0a0a; padding: 12px; border-radius: 4px; margin-top: 15px; border: 1px solid #1a1a1a; }
+        .copy-box { background: #000; padding: 12px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -43,39 +44,34 @@
     <div id="cart-list"></div>
     <div id="checkout-sec" style="display:none">
         <div class="admin-sec">
-            <h3 style="color:var(--gold); text-align:center;">CHECKOUT</h3>
-            <select id="pay-sel" onchange="showPay(this.value)">
-                <option value="">SELECT PAYMENT METHOD</option>
-            </select>
+            <select id="pay-sel" onchange="showPay(this.value)"><option value="">SELECT PAYMENT METHOD</option></select>
             <div id="pay-details" style="display:none;">
                 <div class="copy-box" onclick="copyNum(this.innerText)" id="pay-num"></div>
-                <p style="text-align:center; font-size:10px;">TAP NUMBER TO COPY</p>
+                <p style="text-align:center; font-size:10px; color:var(--gold)">TAP TO COPY</p>
             </div>
-            <button class="btn" onclick="tg.showAlert('SEND RECEIPT TO BOT')">CONFIRM</button>
+            <button class="btn" onclick="confirmOrder()">CONFIRM & CHECKOUT</button>
         </div>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
-    <div class="header-title">MW SYSTEM</div>
+    <div class="header-title">SYSTEM CONTROL</div>
     <div class="admin-sec">
-        <h3>ADD ITEMS</h3>
         <select id="adm-cat">
             <option value="3c/L">3c/L</option><option value="4LL/CC">4LL/CC</option>
             <option value="4C/L Same">4C/L Same</option><option value="4C/L">4C/L</option>
             <option value="Double/Triple">Double/Triple</option>
         </select>
         <textarea id="adm-in" rows="3" placeholder="user:pass:price"></textarea>
-        <button class="btn" onclick="doAdm('add_users')">SAVE</button>
+        <button class="btn" onclick="doAdm('add_users')">ADD USERS</button>
     </div>
     <div class="admin-sec">
-        <h3>PAYMENTS</h3>
         <input id="pay-in" placeholder="Method | Details">
-        <button class="btn" onclick="doAdm('add_pay')">ADD</button>
+        <button class="btn" onclick="doAdm('add_pay')">ADD PAYMENT</button>
         <div id="adm-pay-list" style="margin-top:10px"></div>
     </div>
     <div class="admin-sec">
-        <h3>INVENTORY</h3>
+        <h4 style="color:var(--gold); margin:0 0 10px 0;">INVENTORY</h4>
         <div id="adm-items-list"></div>
     </div>
 </div>
@@ -89,16 +85,21 @@
 <script>
     const tg = window.Telegram.WebApp;
     const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw";
+    const clickSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
     let allI = [], allP = [], cart = [];
 
-    if([5859388511, 6920293690].includes(tg.initDataUnsafe.user?.id)) document.getElementById('adm-btn').style.display='block';
+    // Admin Auth
+    if([5859388511, 6920293690].includes(tg.initDataUnsafe.user?.id)) {
+        document.getElementById('adm-btn').style.display='block';
+    }
 
     async function load() {
-        try {
-            const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
-            const d = await r.json(); allI = d.items||[]; allP = d.payments||[];
-            renderAdmin(); renderCheckout();
-        } catch(e) {}
+        const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
+        const d = await r.json(); 
+        allI = d.items||[]; 
+        allP = d.payments||[];
+        renderAdmin(); 
+        renderCheckout();
     }
 
     function tab(id, el) {
@@ -106,7 +107,7 @@
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
         el.classList.add('active-nav');
-        if(id==='admin-tab' || id==='store-tab') load();
+        load();
     }
 
     async function doAdm(action) {
@@ -115,6 +116,8 @@
             method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
             body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content, cat:document.getElementById('adm-cat').value})
         });
+        document.getElementById('adm-in').value = "";
+        document.getElementById('pay-in').value = "";
         load();
     }
 
@@ -131,13 +134,35 @@
         document.getElementById('adm-items-list').innerHTML = allI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="del('del_user','${i.u}')">DEL</button></div>`).join('');
     }
 
-    function addToCart(u, p) { cart.push({u, p}); document.getElementById('c-count').innerText = cart.length; renderCart(); }
+    function addToCart(u, p) {
+        if(cart.find(x => x.u === u)) return;
+        clickSound.play();
+        cart.push({u, p});
+        document.getElementById('c-count').innerText = cart.length;
+        renderCart();
+        tg.HapticFeedback.impactOccurred('light');
+    }
 
     function renderCart() {
         const list = document.getElementById('cart-list');
-        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>EMPTY</p>"; document.getElementById('checkout-sec').style.display='none'; return; }
-        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" onclick="cart.splice(${idx},1);renderCart();">X</button></div>`).join('');
+        if(cart.length === 0) { 
+            list.innerHTML = "<p style='text-align:center; color:#555;'>CART IS EMPTY</p>"; 
+            document.getElementById('checkout-sec').style.display='none'; 
+            return; 
+        }
+        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" style="color:red; border-color:red" onclick="cart.splice(${idx},1);renderCart();">X</button></div>`).join('');
         document.getElementById('checkout-sec').style.display = 'block';
+    }
+
+    async function confirmOrder() {
+        for(let item of cart) {
+            await del('del_user', item.u); 
+        }
+        tg.showAlert("PURCHASE CONFIRMED! SEND RECEIPT TO BOT.");
+        cart = []; 
+        document.getElementById('c-count').innerText = "0"; 
+        renderCart();
+        load();
     }
 
     function renderCheckout() {
@@ -151,15 +176,30 @@
         document.getElementById('pay-num').innerText = allP[i].split('|')[1]?.trim() || "NO DATA";
     }
 
-    function copyNum(t) { navigator.clipboard.writeText(t); tg.showAlert("COPIED: " + t); }
+    function copyNum(t) {
+        navigator.clipboard.writeText(t);
+        tg.showScanQrPopup({ text: "NUMBER COPIED!" });
+        setTimeout(() => tg.closeScanQrPopup(), 800);
+    }
 
     function showCat(c) {
-        document.getElementById('cat-menu').style.display='none'; document.getElementById('items-view').style.display='block';
+        document.getElementById('cat-menu').style.display='none'; 
+        document.getElementById('items-view').style.display='block';
         const fil = allI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = fil.length === 0 ? "<p style='text-align:center'>EMPTY</p>" : fil.map(i => `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button></div>`).join('');
+        document.getElementById('items-list').innerHTML = fil.length === 0 ? "<p style='text-align:center; color:#555;'>NO ITEMS AVAILABLE</p>" : fil.map(i => {
+            const inCart = cart.find(x => x.u === i.u);
+            return `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div>
+            <button class="btn-small" ${inCart?'disabled':''} onclick="addToCart('${i.u}','${i.p}')">${inCart?'ADDED':'ADD'}</button></div>`;
+        }).join('');
     }
-    function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
-    tg.expand(); load();
+
+    function backToCats() { 
+        document.getElementById('cat-menu').style.display='block'; 
+        document.getElementById('items-view').style.display='none'; 
+    }
+
+    tg.expand(); 
+    load();
 </script>
 </body>
 </html>
