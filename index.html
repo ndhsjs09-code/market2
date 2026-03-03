@@ -10,23 +10,26 @@
         body { background: var(--mw-dark); color: #e0e0e0; font-family: sans-serif; padding: 15px; padding-bottom: 110px; margin:0; }
         .tab { display: none; } .active { display: block; }
         .header-container { text-align: center; margin-bottom: 30px; padding: 20px; border: 1px solid var(--mw-gold); background: rgba(212, 175, 55, 0.05); }
-        .header-title { color: var(--mw-gold); font-weight: 900; font-size: 28px; letter-spacing: 5px; margin: 0; }
+        .header-title { color: var(--mw-gold); font-weight: 900; font-size: 22px; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
         .cat-card { background: var(--mw-card); padding: 25px; margin-bottom: 15px; text-align: center; border-left: 4px solid var(--mw-gold); border-top: 1px solid var(--mw-border); font-size: 16px; font-weight: bold; color: #fff; cursor: pointer; }
-        .card { background: var(--mw-card); border: 1px solid var(--mw-border); padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: var(--mw-gold); color: #000; border: none; padding: 16px; font-weight: 900; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px; }
-        .btn-small { background: transparent; color: var(--mw-gold); padding: 8px 15px; border: 1px solid var(--mw-gold); border-radius: 4px; cursor: pointer; }
+        .card { background: var(--mw-card); border: 1px solid var(--mw-border); padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .btn { background: var(--mw-gold); color: #000; border: none; padding: 16px; font-weight: 900; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .btn-small { background: transparent; color: var(--mw-gold); padding: 8px 15px; border: 1px solid var(--mw-gold); border-radius: 4px; cursor: pointer; font-weight: bold; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--mw-border); z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; font-size: 12px; } 
         .active-nav { color: var(--mw-gold); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #080808; color: #fff; border: 1px solid #222; box-sizing: border-box; }
-        .pay-info-box { background: #111; border: 1px dashed var(--mw-gold); padding: 15px; margin: 10px 0; text-align: center; display: none; }
-        .copy-badge { background: var(--mw-gold); color: #000; padding: 2px 8px; font-size: 10px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #080808; color: #fff; border: 1px solid #222; box-sizing: border-box; border-radius: 4px; }
+        .admin-section { background: #0a0a0a; padding: 15px; border: 1px solid #222; border-radius: 8px; margin-top: 10px; }
+        h3 { font-size: 13px; color: var(--mw-gold); margin: 5px 0; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <div id="store-tab" class="tab active">
-    <div class="header-container"><div class="header-title">MW STORE</div></div>
+    <div class="header-container">
+        <div class="header-title" id="mw-welcome">MW MARKET</div>
+    </div>
+    
     <div id="cat-menu">
         <div class="cat-card" onclick="showCat('3C/L')">3C / L</div>
         <div class="cat-card" onclick="showCat('4CC/LL')">4CC / LL</div>
@@ -35,56 +38,57 @@
         <div class="cat-card" onclick="showCat('4C/L')">4C / L</div>
         <div class="cat-card" onclick="showCat('Others')">OTHERS</div>
     </div>
+
     <div id="items-view" style="display:none">
-        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">BACK</button>
+        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK</button>
         <div id="items-list"></div>
     </div>
 </div>
 
-<div id="cart-tab" class="tab">
-    <div class="header-container"><div class="header-title">CART</div></div>
-    <div id="cart-list"></div>
-    <div id="cart-footer" style="display:none">
-        <div style="padding:15px; border:1px solid var(--mw-gold); margin-bottom:15px; text-align:center;">
-            TOTAL: $<span id="total-price">0.00</span>
-        </div>
-        <select id="pay-sel" onchange="updatePayDetails()"></select>
-        <div id="pay-info-box" class="pay-info-box">
-            <span id="pay-text"></span>
-            <span class="copy-badge" onclick="copyPay()">COPY</span>
-        </div>
-        <input type="file" id="receipt" accept="image/*" style="margin-top:15px">
-        <button class="btn" onclick="sendOrder()">CONFIRM ORDER</button>
-    </div>
-</div>
-
 <div id="admin-tab" class="tab">
-    <div class="header-container"><div class="header-title">SYSTEM</div></div>
-    <p style="color:var(--mw-gold)">ADD USERS</p>
-    <textarea id="admin-in" rows="4" placeholder="user|pass|price"></textarea>
-    <button class="btn" onclick="adminAction('add_users', 'admin-in')">ADD</button>
+    <div class="header-container"><div class="header-title">MW CONTROL</div></div>
     
-    <p style="color:var(--mw-gold); margin-top:20px">ADD PAYMENT</p>
-    <input type="text" id="pay-in" placeholder="Method | Details">
-    <button class="btn" onclick="adminAction('add_pay', 'pay-in')">ADD</button>
-    <div id="current-pays" style="margin-top:10px"></div>
+    <div class="admin-section">
+        <h3>1. Select Category</h3>
+        <select id="mw-target-cat">
+            <option value="3C/L">3C/L</option>
+            <option value="4CC/LL">4CC/LL</option>
+            <option value="Double/Triple">Double/Triple</option>
+            <option value="4C/L Same">4C/L Same</option>
+            <option value="4C/L">4C/L</option>
+            <option value="Others">Others</option>
+        </select>
+        
+        <h3>2. Accounts Data</h3>
+        <p style="font-size: 10px; color: #666; margin: 0;">Format: user:pass:email:price (Supports : / | ;)</p>
+        <textarea id="mw-admin-in" rows="6" placeholder="Example:
+user1:pass1:mail1:10
+user2/pass2/mail2/15"></textarea>
+        
+        <button class="btn" onclick="mwAddAccs()">ADD TO MW MARKET</button>
+    </div>
 </div>
 
 <nav class="nav">
     <div class="nav-item active-nav" onclick="tab('store-tab', this)">MARKET</div>
-    <div class="nav-item" onclick="tab('cart-tab', this)">CART [<span id="count">0</span>]</div>
-    <div id="admin-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">SYSTEM</div>
+    <div id="mw-admin-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">SYSTEM</div>
 </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    // الرابط الجديد من صورتك
+    // رابط الـ API الخاص بـ MW
     const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw"; 
     const ADMIN_IDS = [5859388511, 6920293690];
-    
-    let cart = [], allI = [], allP = [];
+    let mwItems = [];
 
-    if(ADMIN_IDS.includes(tg.initDataUnsafe.user?.id)) document.getElementById('admin-btn').style.display='block';
+    // ترحيب مخصص
+    const userFirstName = tg.initDataUnsafe.user?.first_name || "User";
+    document.getElementById('mw-welcome').innerText = `WELCOME ${userFirstName} TO MW MARKET`;
+
+    // إظهار زر الأدمن
+    if(ADMIN_IDS.includes(tg.initDataUnsafe.user?.id)) {
+        document.getElementById('mw-admin-btn').style.display = 'block';
+    }
 
     function tab(id, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -93,90 +97,68 @@
         el.classList.add('active-nav');
     }
 
-    async function load() {
+    async function loadMW() {
         try {
-            const r = await fetch(`${API}/get_all`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+            const r = await fetch(`${API}/get_all`, { 
+                headers: { "ngrok-skip-browser-warning": "true" } 
+            });
             const d = await r.json();
-            allI = d.items; allP = d.payments;
-            
-            document.getElementById('pay-sel').innerHTML = '<option disabled selected>SELECT PAYMENT</option>' + 
-                allP.map(p => `<option value="${p}">${p.split('|')[0].trim()}</option>`).join('');
-
-            document.getElementById('current-pays').innerHTML = allP.map(p => `
-                <div class="card" style="font-size:11px">
-                    <span>${p}</span>
-                    <button class="btn-small" style="color:red; border:none;" onclick="adminAction('del_pay', '', '${p}')">DEL</button>
-                </div>`).join('');
-        } catch(e) { console.log(e); }
+            mwItems = d.items;
+        } catch(e) { console.error("Load Error"); }
     }
 
-    function updatePayDetails() {
-        const val = document.getElementById('pay-sel').value;
-        if(val.includes('|')) {
-            document.getElementById('pay-text').innerText = val.split('|')[1].trim();
-            document.getElementById('pay-info-box').style.display = 'block';
-        }
-    }
+    async function mwAddAccs() {
+        const cat = document.getElementById('mw-target-cat').value;
+        const content = document.getElementById('mw-admin-in').value;
+        if(!content) return tg.showAlert("Please enter data");
 
-    function copyPay() {
-        navigator.clipboard.writeText(document.getElementById('pay-text').innerText);
-        tg.showAlert("Copied!");
-    }
-
-    async function adminAction(action, inputId, direct = null) {
-        const content = direct || document.getElementById(inputId).value;
-        if(!content) return;
         try {
             const r = await fetch(`${API}/admin/manage`, {
-                method:'POST',
-                headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning': 'true'},
-                body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, action, content })
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+                body: JSON.stringify({
+                    user_id: tg.initDataUnsafe.user.id,
+                    action: 'add_users',
+                    cat: cat,
+                    content: content
+                })
             });
             const res = await r.json();
-            if(res.status === "ok") { tg.showAlert("Success!"); load(); if(inputId) document.getElementById(inputId).value=""; }
-        } catch(e) { tg.showAlert("Error! Check Server."); }
+            if(res.status === "ok") {
+                tg.showAlert(`Successfully added to ${cat}`);
+                document.getElementById('mw-admin-in').value = "";
+                loadMW();
+            }
+        } catch(e) {
+            tg.showAlert("Server Connection Failed");
+        }
     }
 
     function showCat(c) {
-        document.getElementById('cat-menu').style.display='none';
-        document.getElementById('items-view').style.display='block';
-        const filtered = allI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = filtered.map(i => `
-            <div class="card">
-                <div><b>@${i.u}</b><br><small>$${i.p}</small></div>
-                <button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button>
-            </div>`).join('');
+        document.getElementById('cat-menu').style.display = 'none';
+        document.getElementById('items-view').style.display = 'block';
+        const filtered = mwItems.filter(i => i.c == c);
+        
+        document.getElementById('items-list').innerHTML = filtered.length === 0 ? 
+            '<p style="text-align:center; color:#555; margin-top:50px;">NO ITEMS AVAILABLE</p>' : 
+            filtered.map(i => `
+                <div class="card">
+                    <div>
+                        <b style="color:var(--mw-gold); font-size:16px;">@${i.u}</b>
+                        <div style="font-size:12px; color:#888; margin-top:4px;">Price: $${i.p}</div>
+                    </div>
+                    <button class="btn-small">BUY</button>
+                </div>
+            `).join('');
     }
 
-    function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
-    function addToCart(u,p) { cart.push({u,p}); document.getElementById('count').innerText = cart.length; renderCart(); }
-    
-    function renderCart() {
-        const list = document.getElementById('cart-list');
-        if(cart.length==0) { list.innerHTML="Empty"; document.getElementById('cart-footer').style.display='none'; }
-        else {
-            list.innerHTML = cart.map(i => `<div class="card"><span>@${i.u}</span></div>`).join('');
-            document.getElementById('cart-footer').style.display='block';
-            document.getElementById('total-price').innerText = cart.reduce((s,i) => s + parseFloat(i.p), 0).toFixed(2);
-        }
+    function backToCats() {
+        document.getElementById('cat-menu').style.display = 'block';
+        document.getElementById('items-view').style.display = 'none';
     }
 
-    async function sendOrder() {
-        const f = document.getElementById('receipt').files[0];
-        if(!f) return tg.showAlert("Upload Receipt");
-        const reader = new FileReader();
-        reader.readAsDataURL(f);
-        reader.onload = async () => {
-            await fetch(`${API}/submit`, {
-                method:'POST',
-                headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning': 'true'},
-                body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, items:cart, method:document.getElementById('pay-sel').value, image:reader.result, total:document.getElementById('total-price').innerText })
-            });
-            tg.showAlert("Order Sent!", () => tg.close());
-        }
-    }
-
-    tg.expand(); load();
+    tg.expand();
+    loadMW();
 </script>
 </body>
 </html>
