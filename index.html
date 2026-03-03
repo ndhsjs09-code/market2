@@ -85,13 +85,13 @@
                 img.src = e.target.result;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const max = 800; let w = img.width, h = img.height;
-                    if (w > max) { h *= max / w; w = max; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    base64Img = canvas.toDataURL('image/jpeg', 0.6);
-                    const p = document.getElementById("img-preview");
-                    p.src = base64Img; p.style.display = "block";
+                    const maxW = 600;
+                    const scale = maxW / img.width;
+                    canvas.width = maxW; canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    base64Img = canvas.toDataURL('image/jpeg', 0.4);
+                    document.getElementById("img-preview").src = base64Img;
+                    document.getElementById("img-preview").style.display = "block";
                 };
             };
             reader.readAsDataURL(input.files[0]);
@@ -112,24 +112,23 @@
         if(!base64Img) return tg.showAlert("UPLOAD RECEIPT IMAGE");
         const btn = document.getElementById("send-btn");
         btn.innerText = "SENDING..."; btn.disabled = true;
-        const total = cart.reduce((s, i) => s + parseFloat(i.p), 0);
-        await fetch(API + "/send_order", {
-            method:"POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-                user_id:tg.initDataUnsafe.user.id,
-                user_name:tg.initDataUnsafe.user.username || "Unknown",
-                items:cart, total, method:allP[selIdx].split("|")[0],
-                image: base64Img
-            })
-        });
-        tg.showAlert("ORDER SENT");
-        tg.close();
+        try {
+            await fetch(API + "/send_order", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    user_id:tg.initDataUnsafe.user.id,
+                    user_name:tg.initDataUnsafe.user.username || "Unknown",
+                    items:cart, total: cart.reduce((s,i)=>s+parseFloat(i.p),0),
+                    method:allP[selIdx].split("|")[0], image: base64Img
+                })
+            });
+            tg.showAlert("ORDER SENT"); tg.close();
+        } catch(e) { tg.showAlert("ERROR"); btn.innerText="SEND ORDER"; btn.disabled=false; }
     }
 
     function addToCart(u, p) {
         if(cart.find(x => x.u === u)) return;
-        cart.push({u, p});
-        document.getElementById("c-count").innerText = cart.length;
+        cart.push({u, p}); document.getElementById("c-count").innerText = cart.length;
         renderCart();
     }
 
@@ -151,10 +150,7 @@
     function showCat(c) {
         document.getElementById("cat-menu").style.display="none"; document.getElementById("items-view").style.display="block";
         const fil = allI.filter(i => i.c == c);
-        document.getElementById("items-list").innerHTML = fil.map(i => {
-            const inCart = cart.find(x => x.u === i.u);
-            return `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" ${inCart?"disabled":""} onclick="addToCart('${i.u}','${i.p}')">${inCart?"ADDED":"ADD"}</button></div>`;
-        }).join("");
+        document.getElementById("items-list").innerHTML = fil.map(i => `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button></div>`).join("");
     }
 
     async function load() {
@@ -167,8 +163,7 @@
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active-nav"));
-        el.classList.add("active-nav");
-        load();
+        el.classList.add("active-nav"); load();
     }
     function backToCats() { document.getElementById("cat-menu").style.display="block"; document.getElementById("items-view").style.display="none"; }
     function renderCheckout() { const sel = document.getElementById("pay-sel"); sel.innerHTML = '<option value="">SELECT PAYMENT</option>' + allP.map((p, i) => `<option value="${i}">${p.split("|")[0]}</option>`).join(""); }
