@@ -13,18 +13,19 @@
         .cat-card { background: var(--card); padding: 18px; margin-bottom: 8px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; color: var(--gold); }
         .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
         .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 4px; margin-top: 10px; text-transform: uppercase; }
-        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; border-radius: 2px; }
+        .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; }
         .btn-small:disabled { border-color: #333; color: #444; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 4px; box-sizing: border-box; text-align: center; }
-        .copy-box { background: #000; padding: 15px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; font-family: monospace; font-size: 18px; }
+        .copy-box { background: #000; padding: 15px; border: 1px dashed var(--gold); margin: 10px 0; color: var(--gold); font-weight: bold; cursor: pointer; text-align: center; font-size: 18px; }
+        #img-preview { width: 100%; max-height: 150px; object-fit: contain; margin-top: 10px; display: none; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div id="store-tab" class="tab active">
-    <div class="header">MW MARKET</div>
+    <div class="header">MW STORE</div>
     <div id="cat-menu">
         <div class="cat-card" onclick="showCat('3c/L')">3c / L</div>
         <div class="cat-card" onclick="showCat('4LL/CC')">4LL / CC</div>
@@ -45,22 +46,25 @@
         <select id="pay-sel" onchange="showPay(this.value)"><option value="">SELECT PAYMENT</option></select>
         <div id="pay-details" style="display:none;">
             <div class="copy-box" onclick="copyNum(this.innerText)" id="pay-num"></div>
-            <p style="text-align:center; font-size:10px; color:var(--gold)">CLICK TO COPY</p>
+            <p style="text-align:center; font-size:10px; color:var(--gold)">TAP NUMBER TO COPY</p>
+            <hr style="border:0; border-top:1px solid #222; margin:15px 0;">
+            <p style="text-align:center; font-size:12px;">UPLOAD PAYMENT RECEIPT</p>
+            <input type="file" id="receipt-file" accept="image/*" onchange="previewImg(this)">
+            <img id="img-preview">
         </div>
-        <button class="btn" onclick="confirmOrder()">SEND ORDER</button>
+        <button class="btn" id="send-btn" onclick="confirmOrder()">SEND ORDER WITH RECEIPT</button>
     </div>
 </div>
 
 <div id="admin-tab" class="tab">
-    <div class="header">SYSTEM CONTROL</div>
+    <div class="header">MW SYSTEM</div>
     <select id="adm-cat"><option value="3c/L">3c/L</option><option value="4LL/CC">4LL/CC</option><option value="4C/L Same">4C/L Same</option><option value="4C/L">4C/L</option><option value="Double/Triple">Double/Triple</option></select>
-    <textarea id="adm-in" rows="3" placeholder="user:pass:price (accepts : | / ;)"></textarea>
+    <textarea id="adm-in" rows="3" placeholder="user:pass:price"></textarea>
     <button class="btn" onclick="doAdm('add_users')">SAVE ITEMS</button>
-    <hr style="border:0; border-top:1px solid #1a1a1a; margin:20px 0;">
     <input id="pay-in" placeholder="Method | Details">
     <button class="btn" onclick="doAdm('add_pay')">ADD PAYMENT</button>
-    <div id="adm-pay-list" style="margin-top:15px"></div>
-    <div id="adm-items-list" style="margin-top:15px"></div>
+    <div id="adm-pay-list"></div>
+    <div id="adm-items-list"></div>
 </div>
 
 <nav class="nav">
@@ -73,7 +77,7 @@
     const tg = window.Telegram.WebApp;
     const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw";
     const audio = new Audio("https://www.soundjay.com/buttons/sounds/button-16.mp3");
-    let allI = [], allP = [], cart = [];
+    let allI = [], allP = [], cart = [], base64Img = null;
 
     if([5859388511, 6920293690].includes(tg.initDataUnsafe.user?.id)) document.getElementById("adm-btn").style.display="block";
 
@@ -83,12 +87,17 @@
         renderAdmin(); renderCheckout();
     }
 
-    function tab(id, el) {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.getElementById(id).classList.add("active");
-        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active-nav"));
-        el.classList.add("active-nav");
-        load();
+    function previewImg(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64Img = e.target.result;
+                const preview = document.getElementById("img-preview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     function copyNum(t) {
@@ -96,19 +105,33 @@
         el.value = t; document.body.appendChild(el);
         el.select(); document.execCommand("copy");
         document.body.removeChild(el);
-        tg.showAlert("COPIED TO CLIPBOARD");
+        tg.showAlert("COPIED: " + t);
     }
 
     async function confirmOrder() {
-        const sel = document.getElementById("pay-sel").value;
-        if(!sel) { tg.showAlert("SELECT PAYMENT"); return; }
+        const selIdx = document.getElementById("pay-sel").value;
+        if(!selIdx) return tg.showAlert("SELECT PAYMENT METHOD");
+        if(!base64Img) return tg.showAlert("PLEASE UPLOAD RECEIPT IMAGE");
+
+        document.getElementById("send-btn").innerText = "SENDING...";
+        document.getElementById("send-btn").disabled = true;
+
         const total = cart.reduce((s, i) => s + parseFloat(i.p), 0);
         await fetch(API + "/send_order", {
             method:"POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, user_name:tg.initDataUnsafe.user.username, items:cart, total:total, method:allP[sel].split("|")[0]})
+            body:JSON.stringify({
+                user_id:tg.initDataUnsafe.user.id,
+                user_name:tg.initDataUnsafe.user.username || "Unknown",
+                items:cart, total, method:allP[selIdx].split("|")[0],
+                image: base64Img
+            })
         });
-        tg.showAlert("ORDER SENT. UPLOAD SCREENSHOT IN CHAT.");
-        cart = []; document.getElementById("c-count").innerText = "0"; renderCart();
+
+        tg.showAlert("SUCCESS! ORDER SENT TO ADMIN.");
+        cart = []; document.getElementById("c-count").innerText = "0";
+        document.getElementById("checkout-sec").style.display = "none";
+        base64Img = null;
+        tg.close();
     }
 
     function addToCart(u, p) {
@@ -140,6 +163,14 @@
             const inCart = cart.find(x => x.u === i.u);
             return `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" ${inCart?"disabled":""} onclick="addToCart('${i.u}','${i.p}')">${inCart?"ADDED":"ADD"}</button></div>`;
         }).join("");
+    }
+
+    function tab(id, el) {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active-nav"));
+        el.classList.add("active-nav");
+        load();
     }
 
     function backToCats() { document.getElementById("cat-menu").style.display="block"; document.getElementById("items-view").style.display="none"; }
