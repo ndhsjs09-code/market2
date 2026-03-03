@@ -6,151 +6,123 @@
     <title>MW Market</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --mw-gold: #d4af37; --mw-bg: #050505; --mw-card: #0f0f0f; --mw-border: #1a1a1a; }
-        body { background: var(--mw-bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; padding-bottom: 110px; margin:0; }
+        :root { --gold: #d4af37; --bg: #050505; --card: #0f0f0f; }
+        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
         .tab { display: none; } .active { display: block; }
-        .header-tag { color: var(--mw-gold); font-weight: 900; font-size: 14px; text-align: center; margin-bottom: 5px; display: block; }
-        .header-container { text-align: center; margin-bottom: 25px; padding: 15px; border: 1px solid var(--mw-gold); background: rgba(212, 175, 55, 0.05); border-radius: 8px; }
-        .header-title { color: var(--mw-gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; margin: 0; }
-        .cat-card { background: var(--mw-card); padding: 22px; margin-bottom: 10px; text-align: center; border-left: 4px solid var(--mw-gold); border-radius: 8px; font-weight: bold; cursor: pointer; border-right: 1px solid var(--mw-border); }
-        .card { background: var(--mw-card); border: 1px solid var(--mw-border); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; }
-        .btn { background: var(--mw-gold); color: #000; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: 900; margin-top: 5px; }
-        .btn-small { background: transparent; color: var(--mw-gold); padding: 6px 12px; border: 1px solid var(--mw-gold); border-radius: 6px; font-size: 11px; font-weight: bold; }
-        .btn-del { background: #ff4444; color: #fff; padding: 5px 10px; border-radius: 5px; border: none; font-size: 10px; }
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid var(--mw-border); z-index: 1000; }
-        .nav-item { color: #444; cursor: pointer; font-weight: 900; font-size: 13px; } .active-nav { color: var(--mw-gold); }
-        input, textarea, select { width: 100%; padding: 11px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 8px; box-sizing: border-box; }
-        .admin-section { background:#0a0a0a; padding:12px; border-radius:10px; margin-top:10px; border: 1px solid #1a1a1a; }
-        h3 { font-size: 12px; color: var(--mw-gold); margin: 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .mw-tag { color: var(--gold); font-weight: 900; text-align: center; display: block; margin-bottom: 5px; }
+        .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; }
+        .cat-card { background: var(--card); padding: 22px; margin-bottom: 10px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; }
+        .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; }
+        .btn-small { background: transparent; color: var(--gold); padding: 5px 10px; border: 1px solid var(--gold); font-size: 11px; }
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; }
+        .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
     </style>
 </head>
 <body>
-
+<span class="mw-tag">#MW Market</span>
 <div id="store-tab" class="tab active">
-    <span class="header-tag">#MW Market</span>
-    <div class="header-container">
-        <div class="header-title" id="mw-welcome">MW STORE</div>
-    </div>
-
+    <div class="header-title">MW STORE</div>
     <div id="cat-menu">
         <div class="cat-card" onclick="showCat('3C/L')">3C / L</div>
         <div class="cat-card" onclick="showCat('4CC/LL')">4CC / LL</div>
         <div class="cat-card" onclick="showCat('Double/Triple')">DOUBLE / TRIPLE</div>
-        <div class="cat-card" onclick="showCat('4C/L Same')">4C / L SAME</div>
-        <div class="cat-card" onclick="showCat('4C/L')">4C / L</div>
         <div class="cat-card" onclick="showCat('Others')">OTHERS</div>
     </div>
-
     <div id="items-view" style="display:none">
-        <button class="btn-small" onclick="backToCats()" style="margin-bottom:15px">← BACK TO LIST</button>
+        <button class="btn-small" onclick="backToCats()" style="margin-bottom:10px">BACK</button>
         <div id="items-list"></div>
     </div>
 </div>
 
+<div id="cart-tab" class="tab">
+    <div class="header-title">MW CART</div>
+    <div id="cart-list"></div>
+    <div id="cart-footer" style="display:none; text-align:center;">
+        <button class="btn">PROCEED TO PAY</button>
+    </div>
+</div>
+
 <div id="admin-tab" class="tab">
-    <div class="header-container"><div class="header-title">MW ADMIN SYSTEM</div></div>
-    
-    <div class="admin-section">
-        <h3>1. ADD ACCOUNTS BY CATEGORY</h3>
-        <select id="mw-cat-select">
-            <option value="3C/L">3C/L</option><option value="4CC/LL">4CC/LL</option>
-            <option value="Double/Triple">Double/Triple</option><option value="4C/L Same">4C/L Same</option>
-            <option value="4C/L">4C/L</option><option value="Others">Others</option>
-        </select>
-        <textarea id="mw-admin-in" rows="3" placeholder="user:pass:email:price"></textarea>
-        <button class="btn" onclick="mwAdminAction('add_users')">SAVE TO CATEGORY</button>
-    </div>
-
-    <div class="admin-section">
-        <h3>2. MANAGE PAYMENTS</h3>
-        <input id="mw-p-data" placeholder="Method Name | Details">
-        <button class="btn" onclick="mwAdminAction('add_pay')">ADD PAYMENT</button>
-        <div id="mw-admin-pay-list" style="margin-top:10px"></div>
-    </div>
-
-    <div class="admin-section">
-        <h3>3. INVENTORY DELETE</h3>
-        <div id="mw-admin-items-list"></div>
-    </div>
+    <div class="header-title">MW SYSTEM</div>
+    <select id="mw-cat"><option value="3C/L">3C/L</option><option value="Others">Others</option></select>
+    <textarea id="mw-in" rows="4" style="width:100%; background:#0a0a0a; color:#fff;"></textarea>
+    <button class="btn" onclick="mwAdd()">SAVE ACCOUNT</button>
+    <div id="mw-admin-items" style="margin-top:20px"></div>
 </div>
 
 <nav class="nav">
     <div class="nav-item active-nav" onclick="tab('store-tab', this)">MARKET</div>
-    <div id="mw-admin-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">SYSTEM</div>
+    <div class="nav-item" onclick="tab('cart-tab', this)">CART (<span id="mw-cart-count">0</span>)</div>
+    <div id="admin-btn" class="nav-item" style="display:none" onclick="tab('admin-tab', this)">SYSTEM</div>
 </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    // رابط الـ API لمتجر MW
-    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw"; 
-    const ADMIN_IDS = [5859388511, 6920293690];
-    let mwAllI = [], mwAllP = [];
+    const API = "https://laquita-unperturbed-altagracia.ngrok-free.dev/mw";
+    const ADMIN_MW = [5859388511, 6920293690];
+    let mwI = [], cart = [];
 
-    // الترحيب المخصص
-    document.getElementById('mw-welcome').innerText = `Welcome ${tg.initDataUnsafe.user?.first_name || "User"} to MW Market`;
-    
-    // إخفاء الأدمن عن غير المخولين
-    if(ADMIN_IDS.includes(tg.initDataUnsafe.user?.id)) document.getElementById('mw-admin-btn').style.display='block';
+    if(ADMIN_MW.includes(tg.initDataUnsafe.user?.id)) document.getElementById('admin-btn').style.display='block';
 
     function tab(id, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
         el.classList.add('active-nav');
-        if(id === 'admin-tab') renderMWAdmin();
+        if(id==='admin-tab') renderMwAdmin();
+        if(id==='cart-tab') renderMwCart();
     }
 
-    async function loadMW() {
-        try {
-            const r = await fetch(`${API}/get_all`, { headers: { "ngrok-skip-browser-warning": "1" } });
-            const d = await r.json();
-            mwAllI = d.items; mwAllP = d.payments;
-        } catch(e) { console.error("Error loading data"); }
+    async function load() {
+        const r = await fetch(`${API}/get_all`, { headers: {"ngrok-skip-browser-warning":"1"} });
+        const d = await r.json(); mwI = d.items;
     }
 
-    async function mwAdminAction(action) {
-        let content = (action==='add_users') ? document.getElementById('mw-admin-in').value : 
-                      (action==='add_pay') ? document.getElementById('mw-p-data').value : "";
-        let cat = document.getElementById('mw-cat-select').value;
+    function addToCart(u, p) {
+        cart.push({u, p});
+        document.getElementById('mw-cart-count').innerText = cart.length;
+    }
 
-        if(!content && action !== 'del_user') return;
+    function renderMwCart() {
+        const list = document.getElementById('cart-list');
+        if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>EMPTY</p>"; return; }
+        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red;border-color:red" onclick="cart.splice(${idx},1);renderMwCart();">DEL</button></div>`).join('');
+        document.getElementById('cart-footer').style.display = 'block';
+    }
 
+    async function mwAdd() {
+        const content = document.getElementById('mw-in').value;
+        const cat = document.getElementById('mw-cat').value;
         await fetch(`${API}/admin/manage`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning':'1'},
-            body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, action, content, cat })
+            method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
+            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action:'add_users', content, cat})
         });
-        tg.showAlert("Success!"); 
-        if(action==='add_users') document.getElementById('mw-admin-in').value="";
-        loadMW(); renderMWAdmin();
+        document.getElementById('mw-in').value=""; load();
     }
 
-    async function mwDelItem(action, val) {
+    function renderMwAdmin() {
+        document.getElementById('mw-admin-items').innerHTML = mwI.slice(0,10).map(i => `
+            <div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red;border-color:red" onclick="delMw('${i.u}')">DEL</button></div>`).join('');
+    }
+
+    async function delMw(u) {
         await fetch(`${API}/admin/manage`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json', 'ngrok-skip-browser-warning':'1'},
-            body:JSON.stringify({ user_id:tg.initDataUnsafe.user.id, action, content:val })
+            method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
+            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action:'del_user', content:u})
         });
-        loadMW(); setTimeout(renderMWAdmin, 500);
-    }
-
-    function renderMWAdmin() {
-        document.getElementById('mw-admin-pay-list').innerHTML = mwAllP.map(p => `
-            <div class="card" style="font-size:11px"><span>${p.split('|')[0]}</span><button class="btn-del" onclick="mwDelItem('del_pay','${p}')">DEL</button></div>`).join('');
-        document.getElementById('mw-admin-items-list').innerHTML = mwAllI.slice(0,10).map(i => `
-            <div class="card" style="font-size:11px"><span>@${i.u}</span><button class="btn-del" onclick="mwDelItem('del_user','${i.u}')">DEL</button></div>`).join('');
+        load(); setTimeout(renderMwAdmin, 500);
     }
 
     function showCat(c) {
         document.getElementById('cat-menu').style.display='none';
         document.getElementById('items-view').style.display='block';
-        const filtered = mwAllI.filter(i => i.c == c);
-        document.getElementById('items-list').innerHTML = filtered.length === 0 ? '<p style="text-align:center; color:#555;">EMPTY CATEGORY</p>' : filtered.map(i => `
-            <div class="card"><div><b style="color:var(--mw-gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small">SELECT</button></div>`).join('');
+        const fil = mwI.filter(i => i.c == c);
+        document.getElementById('items-list').innerHTML = fil.map(i => `<div class="card"><div><b style="color:var(--gold)">@${i.u}</b><br><small>$${i.p}</small></div><button class="btn-small" onclick="addToCart('${i.u}','${i.p}')">ADD</button></div>`).join('');
     }
 
     function backToCats() { document.getElementById('cat-menu').style.display='block'; document.getElementById('items-view').style.display='none'; }
-    tg.expand(); loadMW();
+    tg.expand(); load();
 </script>
 </body>
 </html>
