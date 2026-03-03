@@ -9,22 +9,19 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #0f0f0f; }
         body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 15px; margin:0; padding-bottom: 100px; }
         .tab { display: none; } .active { display: block; }
-        .mw-tag { color: var(--gold); font-weight: 900; text-align: center; display: block; margin-bottom: 5px; }
         .header-title { text-align: center; color: var(--gold); font-weight: 900; margin-bottom: 20px; font-size: 22px; border: 1px solid var(--gold); padding: 10px; }
         .cat-card { background: var(--card); padding: 22px; margin-bottom: 10px; text-align: center; border-left: 4px solid var(--gold); font-weight: bold; cursor: pointer; }
         .card { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; }
-        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; font-weight: 900; cursor: pointer; border-radius: 5px; }
         .btn-small { background: transparent; color: var(--gold); padding: 6px 12px; border: 1px solid var(--gold); font-size: 11px; font-weight: bold; }
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { color: #444; cursor: pointer; font-weight: 900; } .active-nav { color: var(--gold); }
         input, textarea, select { width: 100%; padding: 12px; margin: 6px 0; background: #0a0a0a; color: #fff; border: 1px solid #222; border-radius: 6px; box-sizing: border-box; }
         .admin-sec { background: #0a0a0a; padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px solid #1a1a1a; }
-        h3 { font-size: 11px; color: var(--gold); margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
-<span class="mw-tag">#MW Market</span>
 <div id="store-tab" class="tab active">
     <div class="header-title">MW STORE</div>
     <div id="cat-menu">
@@ -49,13 +46,11 @@
 <div id="admin-tab" class="tab">
     <div class="header-title">MW SYSTEM</div>
     <div class="admin-sec">
-        <h3>ADD ITEMS</h3>
         <select id="mw-cat-sel"><option value="3C/L">3C/L</option><option value="Others">Others</option></select>
         <textarea id="mw-in" rows="4" placeholder="user:pass:price"></textarea>
-        <button class="btn" onclick="mwAdminAction('add_users')">SAVE</button>
+        <button class="btn" onclick="mwAdminAction()">SAVE ACCOUNTS</button>
     </div>
     <div class="admin-sec">
-        <h3>MANAGE</h3>
         <div id="mw-admin-list">Loading...</div>
     </div>
 </div>
@@ -88,15 +83,15 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
         el.classList.add('active-nav');
         if(id==='admin-tab') renderMwAdmin();
-        if(id==='cart-tab') renderMwCart();
+        if(id==='cart-tab') renderCart();
     }
 
-    async function mwAdminAction(action) {
+    async function mwAdminAction() {
         const content = document.getElementById('mw-in').value;
         const cat = document.getElementById('mw-cat-sel').value;
         await fetch(`${API}/admin/manage`, {
             method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},
-            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action, content, cat})
+            body:JSON.stringify({user_id:tg.initDataUnsafe.user.id, action:'add_users', content, cat})
         });
         document.getElementById('mw-in').value=""; load();
     }
@@ -110,16 +105,14 @@
     }
 
     function renderMwAdmin() {
-        const list = document.getElementById('mw-admin-list');
-        if(mwI.length === 0) { list.innerHTML = "Inventory empty."; return; }
-        list.innerHTML = mwI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="delMw('${i.u}')">DEL</button></div>`).join('');
+        document.getElementById('mw-admin-list').innerHTML = mwI.map(i => `<div class="card"><span>@${i.u}</span><button class="btn-small" style="color:red; border-color:red" onclick="delMw('${i.u}')">DEL</button></div>`).join('');
     }
 
     function addToCart(u, p) { cart.push({u, p}); document.getElementById('mw-cart-count').innerText = cart.length; }
-    function renderMwCart() {
+    function renderCart() {
         const list = document.getElementById('cart-list');
         if(cart.length === 0) { list.innerHTML = "<p style='text-align:center;'>Empty</p>"; return; }
-        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" style="color:red; border-color:red" onclick="cart.splice(${idx},1);renderMwCart();">X</button></div>`).join('');
+        list.innerHTML = cart.map((i, idx) => `<div class="card"><span>@${i.u} - $${i.p}</span><button class="btn-small" style="color:red; border-color:red" onclick="cart.splice(${idx},1);renderCart();">X</button></div>`).join('');
         document.getElementById('cart-footer').style.display = 'block';
     }
 
