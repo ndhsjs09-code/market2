@@ -183,17 +183,38 @@
         }
     }
 
-    async function sendOrder() {
-        const pIdx = document.getElementById("pay-select").value;
-        if(!pIdx || !imgBase64) return tg.showAlert("Complete payment info");
-        const btn = document.getElementById("order-btn");
-        btn.innerText = "SENDING..."; btn.disabled = true;
-        await fetch(API + "/send_order", {
-            method:"POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({ user_name: tg.initDataUnsafe.user.username||"User", user_id: tg.initDataUnsafe.user.id, items:cart, total: cart.reduce((s,i)=>s+parseFloat(i.p),0), method:document.getElementById("pay-select").options[pIdx].text, image: imgBase64 })
-        });
-        tg.showAlert("Success!"); tg.close();
+  async function sendOrder() {
+    const paySelect = document.getElementById("pay-select");
+    const pIdx = paySelect.value;
+    
+    // تأكد من اختيار ميثود
+    if (!pIdx || paySelect.selectedIndex === 0 || !imgBase64) {
+        return tg.showAlert("Please select a payment method and upload the receipt");
     }
+    
+    // التقاط اسم الميثود المختارة من الـ Text الخاص بالـ Option المختار
+    const selectedMethodName = paySelect.options[paySelect.selectedIndex].text;
+
+    const btn = document.getElementById("order-btn");
+    btn.innerText = "SENDING...";
+    btn.disabled = true;
+
+    await fetch(API + "/send_order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            user_name: tg.initDataUnsafe.user.username || "User",
+            user_id: tg.initDataUnsafe.user.id,
+            items: cart,
+            total: cart.reduce((s, i) => s + parseFloat(i.p), 0),
+            method: selectedMethodName, // هنا يتم إرسال الاسم الصحيح
+            image: imgBase64
+        })
+    });
+
+    tg.showAlert("Order Received!");
+    tg.close();
+}
 
     function renderAdmin() {
         document.getElementById("adm-pay-list").innerHTML = payments.map(p => {
