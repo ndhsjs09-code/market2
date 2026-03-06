@@ -64,41 +64,15 @@
 </div>
 
 <div id="store-tab" class="tab active">
-  // 1. تحديث قائمة الفئات في صفحة الـ Store (الأزرار)
-<div class="filter-scroll">
-    <button class="filter-btn active" onclick="filterCat('All', this)">All</button>
-    <button class="filter-btn" onclick="filterCat('3c/L', this)">3c/L</button>
-    <button class="filter-btn" onclick="filterCat('4LL/CC', this)">4LL/CC</button>
-    <button class="filter-btn" onclick="filterCat('4C/L Same', this)">4C/L Same</button>
-    <button class="filter-btn" onclick="filterCat('4C/L', this)">4C/L</button>
-    <button class="filter-btn" onclick="filterCat('Double/Triple', this)">Double/Triple</button>
-</div>
-
-// 2. تحديث القائمة المنسدلة في صفحة الـ System (الآدمن)
-<select id="adm-cat">
-    <option value="3c/L">3c/L</option>
-    <option value="4LL/CC">4LL/CC</option>
-    <option value="4C/L Same">4C/L Same</option>
-    <option value="4C/L">4C/L</option>
-    <option value="Double/Triple">Double/Triple</option>
-</select>
-
-// 3. تعديل وظيفة الفلتر لضمان قراءة النص بدقة
-function filterCat(c, btn) {
-    // إزالة اللون من الأزرار الأخرى
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    // إضافة لون للزر المختار
-    btn.classList.add('active');
-    
-    if(c === 'All') {
-        renderStore(items);
-    } else {
-        // الفلترة حسب الاسم الموجود في الداتابيس
-        const filtered = items.filter(i => i.c.trim() === c.trim());
-        renderStore(filtered);
-    }
-}
-
+    <div class="filter-scroll">
+        <button class="filter-btn active" onclick="filterCat('All', this)">All</button>
+        <button class="filter-btn" onclick="filterCat('3c/L', this)">3c/L</button>
+        <button class="filter-btn" onclick="filterCat('Double/Triple', this)">Double/Triple</button>
+        <button class="filter-btn" onclick="filterCat('4C/L Same', this)">4C/L Same</button>
+        <button class="filter-btn" onclick="filterCat('4LL/CC', this)">4LL/CC</button>
+        <button class="filter-btn" onclick="filterCat('4C/L', this)">4C/L</button>
+    </div>
+    <div id="items-list"></div>
 </div>
 
 <div id="cart-tab" class="tab">
@@ -123,7 +97,7 @@ function filterCat(c, btn) {
     <div class="admin-section">
         <span class="admin-title">Add Users List</span>
         <select id="adm-cat">
-            <option value="3C/L">3C/L</option>
+            <option value="3c/L">3c/L</option>
             <option value="Double/Triple">Double/Triple</option>
             <option value="4C/L Same">4C/L Same</option>
             <option value="4LL/CC">4LL/CC</option>
